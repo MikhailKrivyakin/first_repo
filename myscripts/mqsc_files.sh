@@ -10,7 +10,7 @@ agentnumber=$(echo $1 | cut -c 4-6)
 #creating "rejected directory"
 profuse task run run-command-posserver $1 "New-Item -Path 'C:\DIGI FTP\nsb\coalition\edu\rejected' -ItemType Directory"
 #copy MoveFiles.class to server
-/opt/fujitsu/profuse/zonemaster/tasks/ansible/ansible2_site.sh $1 -m win_copy -a 'src="/root/scripts/mqscfiles/MoveFiles.class" dest=C:/ProgramData/IBM/MQ/mqft/config/QDL2MFT1/agents/WIN_CLIENT_MPESTR_0$agentnumber/exits/mft/samples/'
+/opt/fujitsu/profuse/zonemaster/tasks/ansible/ansible2_site.sh $1 -m win_copy -a 'src="/root/scripts/mqscfiles/MoveFiles.class" dest=C:/ProgramData/IBM/MQ/mqft/config/QDL2MFT1/agents/WIN_CLIENT_MPESTR_0'$agentnumber'/exits/mft/samples/'
 
 #stop agent
 profuse task run run-command-posserver $1 'Get-Service -Name *mqmft*; Get-Service -Name *mqmft* | Stop-Service; Get-Service -Name *mqmft*'
