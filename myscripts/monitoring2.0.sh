@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-#
-#
+#	script for monitor WF upgrade by Mikhail krivyakin
+#	please enjoy, and feel free to contack me in case of any bugs
 #
 #
 
@@ -10,11 +10,11 @@ if [ -e out-runlog.txt ]; then
 #_______________________________________________________________________________
 #check if WF was completed
 if [ $(tail out-runlog.txt |grep "RUN COMPLETED"|wc -l) -gt 0 ] && [ $(tail out-runlog.txt |grep "Errors" | wc -l) -eq 0 ]; then
-	echo -e "   										WF monitoring v2 by Mikhail Krivyakin\n"
+	echo -e "   									$1	WF monitoring v2 by Mikhail Krivyakin\n"
 	echo -e "\n------------------------------Workflow finished, hope you have enjoyed it-----------------------------  "
 else
 #---------------------------------------------------------------------------------
-	current_step_number=$(cat ../06-upgrade-posclients/out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
+	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
 	./status.sh > steps.count						#
 	total_steps=$(($(cat steps.count |wc -l)-3))	# find total step number, using ./status output
@@ -26,7 +26,7 @@ elif [[ $(pwd) == *"till-1"* ]];then
 	unit_type="client"	
 fi	
 	#display current step from out-runlog and title
-	echo -e "   									WF monitoring v2 by Mikhail Krivyakin  "
+	echo -e "   								$1	WF monitoring v2 by Mikhail Krivyakin  "
 	echo -e "---------------------- Current step is: $current_step_number / $total_steps  ----------------------------------------\n"
 	echo -e "----------------------$current_step_name --------------------------------------------"
 
@@ -88,13 +88,27 @@ fi
 ###############Starting parser code
 	if [ -e *$current_step_number*/out-*-error.list ]; then
 		#title of result file
-		echo -e "**********************************************\nThose tills has lockdown issue, keep calm and:\n1.reboot this tills.\n2.Re-run this WF step\n" >> error_log
+		if [[ $1 == "auto" ]];then
+			echo -e "**********************************************\nThose units has lockdown issue.They should be already rebooted by this script" >> error_log 
+		else
+			echo -e "**********************************************\nThose units has lockdown issue, keep calm and:\n1.reboot this tills.\n2.Re-run this WF step\n" >> error_log 
+		fi
+		
 		#checking out error-list and their logs, pooting lockdown and other errors to separate files
-		for unit in $(cat *$current_step_number*/out-*-error.list)
+		for unit in $(cat *$current_name*/out-*-error.list)
 			do
 				# if rows count with "lockdown > 0 than its lockdown"
-			if [ "$(tail *$current_step_number*/out-log/$unit.txt |grep 'ensure template for 'locked' is applied as system'|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 
-				echo -n ":$unit" >> lockdown.list 
+			if [ "$(tail *$current_step_number*/out-log/$unit.txt |grep "ensure template for 'locked' is applied as system"|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 
+				#check: auto reboot mode or not
+				{
+				if [[ $1 == "auto" ]] && [ $(cat rebooted.list |grep $unit |wc -l) -eq 0 ];then
+					echo -n ":$unit" >> lockdown.list 
+					profuse task run run-command-pos$unit_type $unit 'shutdown -r -t 0' >/dev/null						
+					echo "$unit" >> rebooted.list
+				else
+					echo -n ":$unit" >> lockdown.list 
+				fi
+				}&>/dev/null
 			else 
 				echo -e "\t_______ failed __________\t\n" >> other_errors #else it`s some kind of other error and needs invistigation
 				echo "$unit :" >> other_errors
@@ -130,6 +144,6 @@ fi
 #_______________________________________________________________________________
 else
 	#if no outputs then message
-	echo -e "   									WF monitoring v2 by Mikhail Krivyakin\n--------------------------------Upgrade has not started yet-----------------------------  "
+	echo -e "   							$1		WF monitoring v2 by Mikhail Krivyakin\n--------------------------------Upgrade has not started yet-----------------------------  "
 	
 fi	
