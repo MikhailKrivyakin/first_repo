@@ -25,7 +25,9 @@ if [ -e ../06-upgrade-posclients/out-runlog.txt ]; then
 			
 			done
 	# combining files to error_log	
+	{
 		cat lockdown.list |tr '\n' ':'	>> error_log 
+		}&>/dev/null
 		echo '' >> error_log
 		if [ -e other_errors ]; then
 			echo -e '\n \n******************************************\n\nOther failed tills: \n ' >> error_log
