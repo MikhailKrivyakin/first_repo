@@ -9,6 +9,8 @@
 
 #check if WF was running
 if [ -e out-runlog.txt ]; then
+	./status.sh > steps.count.progress
+	total_steps=$(($(cat steps.count.progress |wc -l)-3))
 #title
 	echo -e "						Upgrade progress bar v1 by Mikhail Krivyakin"
 	echo -e "---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps.  ----------------------------------------\n"
@@ -20,8 +22,7 @@ if [ $(tail out-runlog.txt |grep "Aborting" | wc -l) -gt 0 ]; then
 	echo -e 'Workflow was stopped. Check Errors'
 fi
 
-	./status.sh > steps.count
-	total_steps=$(($(cat steps.count |wc -l)-3))
+	
 	
 	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)				#find current step number
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')	#find current_step_name
@@ -54,6 +55,7 @@ fi
 			#start cycle for each till in this store----------------------------------------------------------------------
 			for till in $(cat posclients.list|grep $site)
 				do  
+				if [ -e *$current_step_name*/out-log/$till.txt ];then
 				warning=0
 				time=$((`date +%s` - `date -r *$current_step_name*/out-log/$till.txt +%s`))
 				{
@@ -90,6 +92,7 @@ fi
 					if [ $count_per_rows -gt 3 ]; then						
 						echo ""
 						count_per_rows=0
+					fi
 					fi
 				#________________________________________	
 				done
