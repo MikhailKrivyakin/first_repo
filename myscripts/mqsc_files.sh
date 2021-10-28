@@ -26,6 +26,6 @@ profuse task run run-command-posserver $1 'Get-Service -Name *mqmft*; Get-Servic
 
 profuse task run run-command-posserver $1 "cat C:\ProgramData\IBM\MQ\mqft\config\QDL2MFT1\agents\WIN_CLIENT_MPESTR_0$agentnumber\agent.properties"
 
-echo -e '\n\n****************************************\n MQSC files from server $1 were added to /home/$2/. You can send them via email. Also, above you can see agent.properties content to send it too '
+echo -e "\n\n****************************************\n MQSC files from server $1 were added to /home/$2/. You can send them via email. Also, above you can see agent.properties content to send it too "
 
 

@@ -11,7 +11,7 @@ if [ -e out-runlog.txt ]; then
 		total_steps=$(($(cat steps.count |wc -l)-3))
 		#display current step from out-runlog
 		echo -e "   									WF monitoring v1.2 by Mikhail Krivyakin  "
-		echo -e "---------------------- \033[1mCurrent step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps\033[0m.  ----------------------------------------\n"
+		echo -e "---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps  ----------------------------------------\n"
 		echo -e "----------------------$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') --------------------------------------------"
 	
 		#run scripts
