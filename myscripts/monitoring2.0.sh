@@ -94,7 +94,7 @@ fi
 			echo -e "**********************************************\nThose units has lockdown issue, keep calm and:\n1.reboot this tills.\n2.Re-run this WF step\n" >> error_log 
 		fi
 		
-		#checking out error-list and their logs, pooting lockdown and other errors to separate files
+		#checking out error-list and their logs, puting lockdown and other errors to separate files
 		for unit in $(cat *$current_name*/out-*-error.list)
 			do
 				# if rows count with "lockdown > 0 than its lockdown"
