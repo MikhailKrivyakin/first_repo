@@ -18,14 +18,14 @@ if [ -e out-runlog.txt ]; then
 	
 #title
 	echo -e "						Upgrade progress bar v1.3 by Mikhail Krivyakin"
-	echo -e "---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps.  ------------------------------------------------------\n"
-	echo -e "----------------------$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') ------------------------------------------------------------"
+	echo -e " ---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps.  ------------------------------------------------------------\n"
+	echo -e " ---------------------- $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') ------------------------------------------------------"
 		#progressbar display
 		if [ -e *$current_step_number*/out-posclients-ok.list ];then			
 		{
 			step_percent=$(( $(cat *$current_step_number*/out-posclients-ok.list |wc -l)*100/$(cat posclients.list |wc -l) ))
 		}&>/dev/null
-			echo -ne "\n[ $(for (( i = 0; i < $step_percent; i++ ))do echo -n "*"; done; ) $(for (( i = $step_percent; i < 100; i++ ))do echo -n "-"; done; )]($step_percent%)"
+			echo -ne "\n[ $(for (( i = 0; i < $step_percent; i++ ))do echo -n "="; done; ) $(for (( i = $step_percent; i < 100; i++ ))do echo -n "-"; done; )]($step_percent%)"
 			echo ''
 		fi
 #----------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ fi
 		fi
 		
 		echo -en ':\n'
-		echo "---------------------------------------------------------------------------------------------------------"
+		echo " ---------------------------------------------------------------------------------------------------------"
 		echo -n $site"t001 [100] OK!	"
 			#start cycle for each till in this store----------------------------------------------------------------------
 			for till in $(cat posclients.list|grep $site)
@@ -95,9 +95,14 @@ fi
 					echo -n "$till [$percents] ERROR!	"
 					count_per_rows=$(($count_per_rows+1))
 				#check if already 100%
-				elif [[ $percents -gt 99 ]] && [ $(cat *$current_step_name*/out-posclients-ok.list|grep $till|wc -l ) -gt 0 ]; then
-					echo -n "$till [$percents] OK!	"
+				elif [ $(cat *$current_step_name*/out-posclients-ok.list|grep $till|wc -l ) -gt 0 ]; then
+					if [ $percents -eq 100 ];then				#
+						echo -n "$till [$percents] OK!	"		#
+					else 										#in some cases OK log maybe lesser,then 100%. To avoid unstuctiring output 
+						echo -n "$till [$percents]  OK!	"		#added this if-else
+					fi
 					count_per_rows=$(($count_per_rows+1))
+					
 			#check for changes in 10 minutes and if file is not OK yet	
 				elif [[ $warning -eq 1 ]];then
 					echo -n "$till [$percents] WARNING!"

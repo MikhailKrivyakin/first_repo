@@ -42,10 +42,10 @@ fi
 	fi
 	#choosing title regarding of unit type
 	if [[ $unit_type == "server" ]] || [[ $(pwd) == *"till-1"* ]]; then
-		echo -e '\nProgress per site: \n---------------------------------\nSite		OK/ALL	 	   Failed'
+		echo -e '\nProgress per site: \n---------------------------------\nSite		OK/ALL			Failed'
 
 	else
-		echo -e '\nProgress per site, including till#1\n---------------------------------\nSite		OK/ALL	 	   Failed'
+		echo -e '\nProgress per site, including till#1\n---------------------------------\nSite		OK/ALL		Failed'
 	fi
 #------------------------------------------------------------------------------------
 #start cycle for each stoe in sites.list			
