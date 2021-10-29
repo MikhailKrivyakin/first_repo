@@ -11,13 +11,16 @@ if [ -e out-runlog.txt ]; then
 #check if WF was completed
 if [ $(tail out-runlog.txt |grep "RUN COMPLETED"|wc -l) -gt 0 ] && [ $(tail out-runlog.txt |grep "Errors" | wc -l) -eq 0 ]; then
 	echo -e "   									$1	WF monitoring v2 by Mikhail Krivyakin\n"
-	echo -e "\n------------------------------Workflow finished, hope you have enjoyed it-----------------------------  "
+	echo -e "\n ------------------------------ Workflow finished, hope you have enjoyed it -----------------------------  "
 else
 #---------------------------------------------------------------------------------
+
+
 	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
 	./status.sh > steps.count						#
 	total_steps=$(($(cat steps.count |wc -l)-3))	# find total step number, using ./status output
+	title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
 if [[ $(pwd) == *"server"* ]];then
 	unit_type="server"
 elif [[ $(pwd) == *"client"* ]];then
@@ -25,10 +28,17 @@ elif [[ $(pwd) == *"client"* ]];then
 elif [[ $(pwd) == *"till-1"* ]];then
 	unit_type="client"	
 fi	
+
+
+
+#title
+############################################################################
+
+#############################################################################	
 	#display current step from out-runlog and title
 	echo -e "   								$1	WF monitoring v2 by Mikhail Krivyakin  "
-	echo -e "---------------------- Current step is: $current_step_number / $total_steps  ----------------------------------------\n"
-	echo -e "----------------------$current_step_name --------------------------------------------"
+	echo -e " $(for (( i = 0; i < 37; i++ ))do echo -n "-"; done; ) Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps. $(for (( i = 63; i < 101; i++ ))do echo -n "-"; done; )\n"
+	echo -e " $(for (( i = 0; i < $(( 50-$title_chars_number)); i++ ))do echo -n "-"; done; ) $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') $(for (( i = $(( 50+$title_chars_number)); i < 101; i++ ))do echo -n "-"; done; )"
 
 
 ############# Starting counter code
@@ -42,10 +52,10 @@ fi
 	fi
 	#choosing title regarding of unit type
 	if [[ $unit_type == "server" ]] || [[ $(pwd) == *"till-1"* ]]; then
-		echo -e '\nProgress per site: \n---------------------------------\nSite		OK/ALL			Failed'
+		echo -e '\nProgress per site: \n ---------------------------------\nSite		OK/ALL			Failed'
 
 	else
-		echo -e '\nProgress per site, including till#1\n---------------------------------\nSite		OK/ALL		Failed'
+		echo -e '\nProgress per site, including till#1\n ----------------------------------------------------\nSite		OK/ALL		Failed'
 	fi
 #------------------------------------------------------------------------------------
 #start cycle for each stoe in sites.list			
@@ -59,7 +69,7 @@ fi
 				}&>/dev/null
 				error_count=0
 					#checking if any failed till is exist
-					if [ -e *$current_step_number*/out-*-error.list ]
+					if [ -e *$current_step_number*/out-*-error.list ];
 						then 		
 							#counting error tills
 						
@@ -80,7 +90,7 @@ fi
 				totalOK=$(($totalOK+$ok_count))
 				total=$(($total+$count))
 			done
-		echo "---------------------------------"
+		echo " ----------------------------------------------------"
 		echo  Total"		"$totalOK / $total"			"$totalEr
 
 
@@ -122,7 +132,7 @@ fi
 		}&>/dev/null
 		echo '' >> error_log
 		if [ -e other_errors ]; then
-			echo -e '\n \n******************************************\n\nOther failed tills: \n ' >> error_log
+			echo -e '\n ---------------------------------------------------------------------- \n******************************************\n\nOther failed tills: \n ' >> error_log
 			cat other_errors >> error_log
 			rm other_errors
 		fi
@@ -144,6 +154,6 @@ fi
 #_______________________________________________________________________________
 else
 	#if no outputs then message
-	echo -e "   							$1		WF monitoring v2 by Mikhail Krivyakin\n--------------------------------Upgrade has not started yet-----------------------------  "
+	echo -e "   							$1		WF monitoring v2 by Mikhail Krivyakin\n -------------------------------- Upgrade has not started yet -----------------------------  "
 	
 fi	
