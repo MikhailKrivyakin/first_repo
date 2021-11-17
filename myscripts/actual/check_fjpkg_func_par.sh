@@ -3,10 +3,10 @@
 rm check.file
 export SHELL=$(type -p bash)
 function check_packages {
-barclay='1.33.0_1'
-GB='1.2007.2034_6'
-Opos='2.5.4'
-lockdown='1.3.23'
+barclay='1.33.0_1'	#barclay package version
+GB='1.2007.2034_6'	#globalblue package version
+Opos='2.5.4'		#Opos drivers package version
+lockdown='1.3.23' 	#lockdown package version
 echo " ---------------------------------- $1  ---------------------------------- "
 		profuse task run run-command-posclient $1 'fjpkg pa' |grep "fujitsu-barclay-smartpay \| fujitsu-opos-drivers\|fujitsu-globalblue-windows\|fujitsu-windows-lockdown"|grep "i |" > tmp.file_$1
 ################################################## 

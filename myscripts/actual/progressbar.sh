@@ -9,8 +9,8 @@
 
 #check if WF was running
 if [ -e out-runlog.txt ]; then
-	./status.sh > steps.count.progress
-	total_steps=$(($(cat steps.count.progress |wc -l)-3))
+	#./status.sh > steps.count.progress
+	total_steps=$(($(./status.sh |wc -l)-3))
 	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)				#find current step number
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')	#find current_step_name
 
@@ -21,9 +21,9 @@ if [ -e out-runlog.txt ]; then
 	echo -e " ---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps.  ------------------------------------------------------------\n"
 	echo -e " ---------------------- $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') ------------------------------------------------------"
 		#progressbar display
-		if [ -e *$current_step_number*/out-posclients-ok.list ];then			
+		if [ -e *$current_step_number*/out-*-ok.list ];then			
 		{
-			step_percent=$(( $(cat *$current_step_number*/out-posclients-ok.list |wc -l)*100/$(cat posclients.list |wc -l) ))
+			step_percent=$(( $(cat *$current_step_number*/out-*-ok.list |wc -l)*100/$(cat posclients.list |wc -l) ))
 		}&>/dev/null
 			echo -ne "\n[ $(for (( i = 0; i < $step_percent; i++ ))do echo -n "="; done; ) $(for (( i = $step_percent; i < 100; i++ ))do echo -n "-"; done; )]($step_percent%)"
 			echo ''
@@ -50,15 +50,15 @@ fi
 		
 		count=$(($(cat posclients.list | grep $site | wc -l)+1)) # count in common per store
 		{
-		ok_count=$(($(cat *$current_step_number*/out-posclients-ok.list | grep $site |wc -l)+1))  #counting OK tills
+		ok_count=$(($(cat *$current_step_number*/out-*-ok.list | grep $site |wc -l)+1))  #counting OK tills
 		}&>/dev/null
 		error_count=0
 		#checking if any failed till is exist
 		echo -en "\n\n$site [$ok_count]/[$count]"
 		
-		if [ -e *$current_step_number*/out-posclients-error.list ] && [ $(cat *$current_step_number*/out-posclients-error.list |grep $site |wc -l) -gt 0 ];then 		
+		if [ -e *$current_step_number*/out-*-error.list ] && [ $(cat *$current_step_number*/out-*-error.list |grep $site |wc -l) -gt 0 ];then 		
 				#counting error tills
-					error_count=$(($(cat *$current_step_number*/out-posclients-error.list |grep $site | wc -l)))  #counting error tills
+					error_count=$(($(cat *$current_step_number*/out-*-error.list |grep $site | wc -l)))  #counting error tills
 				echo -n " ERROR [$error_count]"
 		fi
 		
@@ -74,7 +74,7 @@ fi
 					time=$((`date +%s` - `date -r *$current_step_name*/out-log/$till.txt +%s`))
 					
 					#check for changes in 10 minutes and if file is not OK yet				
-						if [ $time -gt 600 ] && [ $(cat *$current_step_name*/out-posclients-ok.list|grep $till|wc -l ) -eq 0 ] ; then
+						if [ $time -gt 600 ] && [ $(cat *$current_step_name*/out-*-ok.list|grep $till|wc -l ) -eq 0 ] ; then
 							warning=1
 						fi
 					
@@ -99,7 +99,7 @@ fi
 						done
 					fi
 					##################################################################################################
-					elif [ $(cat *$current_step_name*/out-posclients-ok.list|grep $till|wc -l ) -gt 0 ];then		#if already in OK list - then 100%
+					elif [ $(cat *$current_step_name*/out-*-ok.list|grep $till|wc -l ) -gt 0 ];then		#if already in OK list - then 100%
 						percents=100	
 					else
 						percents=0
@@ -108,11 +108,11 @@ fi
 					fi
 				#check if this till in error list
 				
-			if [ -e *$current_step_name*/out-posclients-error.list ] && [ $(cat *$current_step_name*/out-posclients-error.list|grep $till|wc -l ) -gt 0 ];then
+			if [ -e *$current_step_name*/out-*-error.list ] && [ $(cat *$current_step_name*/out-*-error.list|grep $till|wc -l ) -gt 0 ];then
 					echo -n "$till [$percents] ERROR!	"
 					count_per_rows=$(($count_per_rows+1))
 				#check if already 100%
-				elif [ $(cat *$current_step_name*/out-posclients-ok.list|grep $till|wc -l ) -gt 0 ]; then
+				elif [ $(cat *$current_step_name*/out-*-ok.list|grep $till|wc -l ) -gt 0 ]; then
 					if [ $percents -eq 100 ];then				#
 						echo -n "$till [$percents] OK!	"		#
 					else 										#in some cases OK log maybe lesser,then 100%. To avoid unstuctiring output 
@@ -143,7 +143,7 @@ fi
 #----------------------------------------------------------------------------------------------------------------------------
 
 
-rm steps.count.progress
+rm steps.count.progress 2>/dev/null
 
 else
 	#if no outputs then message

@@ -16,11 +16,11 @@ echo " ---------------------------------- $1  ----------------------------------
 		else 
 			echo "fixing barclay package on till $1 "
 			echo removing...
-			profuse task run run-command-posclient $1  'fjpkg rm fujitsu-barclay-smartpay'
+			profuse task run run-command-posclient $1  'fjpkg rm fujitsu-barclay-smartpay' >/dev/null
 			echo ref...
-			profuse task run run-command-posclient $1  'fjpkg ref'
+			profuse task run run-command-posclient $1  'fjpkg ref'>/dev/null
 			echo installing...
-			profuse task run run-command-posclient $1  'fjpkg in fujitsu-barclay-smartpay'
+			profuse task run run-command-posclient $1  'fjpkg in fujitsu-barclay-smartpay'>/dev/null
 			echo checking...
 			profuse task run run-command-posclient $1  'fjpkg pa' |grep "fujitsu-barclay-smartpay \| fujitsu-opos-drivers\|fujitsu-globalblue-windows\|fujitsu-windows-lockdown"|grep "i |" > check.file
 				if (($(cat check.file |grep "fujitsu-barclay-smartpay" |grep $barclay |wc -l) > 0 ));then 
@@ -37,11 +37,11 @@ echo " ---------------------------------- $1  ----------------------------------
 		else 
 			echo "fixing GlobalBlue package on till $1"
 			echo removing...
-			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-globalblue-windows'
+			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-globalblue-windows'>/dev/null
 			echo ref...
 			profuse task run run-command-posclient $1 'fjpkg ref'
 			echo installing...
-			profuse task run run-command-posclient $1 'fjpkg in fujitsu-globalblue-windows'
+			profuse task run run-command-posclient $1 'fjpkg in fujitsu-globalblue-windows'>/dev/null
 			echo checking...
 			profuse task run run-command-posclient $1 'fjpkg pa' |grep "fujitsu-barclay-smartpay \| fujitsu-opos-drivers\|fujitsu-globalblue-windows\|fujitsu-windows-lockdown"|grep "i |" > check.file
 				if (($(cat tmp.file |grep "fujitsu-globalblue-windows" |grep $GB |wc -l) > 0 ));then 
@@ -59,11 +59,11 @@ echo " ---------------------------------- $1  ----------------------------------
 		else 
 			echo "fixing Opos drivers package on till $1"
 			echo removing...
-			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-opos-drivers'
+			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-opos-drivers'>/dev/null
 			echo ref...
-			profuse task run run-command-posclient $1 'fjpkg ref'
+			profuse task run run-command-posclient $1 'fjpkg ref'>/dev/null
 			echo installing...
-			profuse task run run-command-posclient $1 'fjpkg in fujitsu-opos-drivers'
+			profuse task run run-command-posclient $1 'fjpkg in fujitsu-opos-drivers'>/dev/null
 			echo checking...
 			profuse task run run-command-posclient $1 'fjpkg pa' |grep "fujitsu-barclay-smartpay \| fujitsu-opos-drivers\|fujitsu-globalblue-windows\|fujitsu-windows-lockdown"|grep "i |" > check.file
 				if (($(cat tmp.file |grep "fujitsu-opos-drivers" |grep $Opos |wc -l) > 0 ));then 
@@ -80,11 +80,11 @@ echo " ---------------------------------- $1  ----------------------------------
 		else 
 			echo "fixing Lockdown package on till $1"
 			echo removing...
-			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809'
+			profuse task run run-command-posclient $1 'fjpkg rm fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809'>/dev/null
 			echo ref...
-			profuse task run run-command-posclient $1 'fjpkg ref'
+			profuse task run run-command-posclient $1 'fjpkg ref'>/dev/null
 			echo installing...
-			profuse task run run-command-posclient $1 'fjpkg in fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809'
+			profuse task run run-command-posclient $1 'fjpkg in fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809'>/dev/null
 			echo checking...
 			profuse task run run-command-posclient $1 'fjpkg pa' |grep "fujitsu-barclay-smartpay \| fujitsu-opos-drivers\|fujitsu-globalblue-windows\|fujitsu-windows-lockdown"|grep "i |" > check.file
 				if (($(cat tmp.file |grep "fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809" |grep $lockdown  |wc -l) > 0 ));then 
