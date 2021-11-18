@@ -18,8 +18,8 @@ else
 
 	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
-	./status.sh > steps.count						#
-	total_steps=$(($(cat steps.count |wc -l)-3))	# find total step number, using ./status output
+						#
+	total_steps=$(($(./status.sh |wc -l)-3))	# find total step number, using ./status output
 	title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
 if [[ $(pwd) == *"server"* ]];then
 	unit_type="server"

@@ -6,7 +6,7 @@
 #		please enjoy, and feel free to contack me in case of any bugs
 
 
-
+title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
 #check if WF was running
 if [ -e out-runlog.txt ]; then
 	#./status.sh > steps.count.progress
@@ -18,8 +18,8 @@ if [ -e out-runlog.txt ]; then
 	
 #title
 	echo -e "						Upgrade progress bar v1.4 by Mikhail Krivyakin"
-	echo -e " ---------------------- Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps.  ------------------------------------------------------------\n"
-	echo -e " ---------------------- $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') ------------------------------------------------------"
+	echo -e " $(for (( i = 0; i < 37; i++ ))do echo -n "-"; done; ) Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps. $(for (( i = 63; i < 101; i++ ))do echo -n "-"; done; )\n"
+	echo -e " $(for (( i = 0; i < $(( 50-$title_chars_number)); i++ ))do echo -n "-"; done; ) $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') $(for (( i = $(( 50+$title_chars_number)); i < 101; i++ ))do echo -n "-"; done; )"
 		#progressbar display
 		if [ -e *$current_step_number*/out-*-ok.list ];then			
 		{
