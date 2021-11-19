@@ -1,0 +1,24 @@
+---
+ - name: Playbook for loops
+   hosts: slave
+   become: yes
+
+   tasks:
+   - name: Loop test
+     debug: msg="Counting {{ item }}"
+     loop: 
+          - "1"
+          - "2"
+          - "3"
+
+   - name: Printing in file and gathering it out
+     shell: echo -n z >> myfile.txt && cat myfile.txt
+     register: output
+     delay: 2
+     retries: 5
+     until: output.stdout.find("zzzz") == false
+
+   - name: Print output
+     debug:
+             var: output.stdout
+

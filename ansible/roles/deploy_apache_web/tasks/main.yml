@@ -1,0 +1,30 @@
+---
+# tasks file for deploy_apache_web
+#
+
+ - name: Ping My servers
+   ping:
+
+
+ - name: gathering uptime from servers
+   shell: "uptime"
+   register: output
+ - name: running pwd on servers
+   shell: "pwd"
+   register: pwd_output
+ - name: Print Uptime and PWD result
+   debug:
+     msg: "server uptime is: ----->>>{{ output.stdout}} and working directory is ------>>> {{pwd_output.stdout}}"
+
+ - name: OS version
+   debug: var=ansible_os_family
+
+
+ - name: Install apache web server
+   yum:  name=httpd state=latest
+ - name: generate HTML file on servers
+   template: src=index.j2 dest={{ destin_folder }}/index.html mode=0555
+   notify: Restart apache
+
+ - name: Start Apache
+   service: name=httpd state=started enabled=yes

@@ -1,0 +1,12 @@
+---
+- name: Test include option
+  hosts: "{{ HOSTNAME }}"
+  become: yes
+
+  tasks:
+  - name: Ping servers
+    ping:
+
+ 
+  - include: create_folder.yml
+  - include: create_files.yml mytext="This is text from VAR"
