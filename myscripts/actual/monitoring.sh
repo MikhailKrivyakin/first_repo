@@ -58,7 +58,7 @@ fi
 		echo -e '\nProgress per site, including till#1\n ----------------------------------------------------\nSite		OK/ALL		Failed'
 	fi
 #------------------------------------------------------------------------------------
-#start cycle for each stoe in sites.list			
+#start cycle for each store in sites.list			
 		for site in $(cat sites.list)
 			do	
 			
@@ -105,7 +105,7 @@ fi
 		fi
 		
 		#checking out error-list and their logs, puting lockdown and other errors to separate files
-		for unit in $(cat *$current_name*/out-*-error.list)
+		for unit in $(cat *$current_step_name*/out-*-error.list)
 			do
 				# if rows count with "lockdown > 0 than its lockdown"
 			if [ "$(tail *$current_step_number*/out-log/$unit.txt |grep "ensure template for 'locked' is applied as system"|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 

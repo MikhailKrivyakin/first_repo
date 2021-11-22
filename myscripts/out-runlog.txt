@@ -1,0 +1,422 @@
+
+====================  RUN STARTED  ====================
+
+Tue Nov  2 22:29:13 CET 2021
+
+Starting from the beginning: 01-ping-posservers
+
+*** RUNNING STEP: 01-ping-posservers ***
+
+Using 'posservers' list from PARENT directory.
+Running: [6 posservers] 'ping-host' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 02-ping-drop1 ***
+
+Using 'drop1' list from PARENT directory.
+Running: [6 drop1] 'ping-host' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 03-ping-drop2 ***
+
+Using 'drop2' list from PARENT directory.
+Running: [6 drop2] 'ping-host' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 04-validate-profiles-sites ***
+
+Using 'sites' list from PARENT directory.
+Validating profile names...
+Validating site profiles before operation 'delete'...
+Validating site profiles for site it0377...
+Validating site profiles for site it0389...
+Validating site profiles for site it0454...
+Validating site profiles for site it0490...
+Validating site profiles for site it0545...
+Validating site profiles for site it0352...
+Using 'sites' list from PARENT directory.
+Validating profile names...
+Validating site profiles before operation 'add'...
+Validating site profiles for site it0377...
+Validating site profiles for site it0389...
+Validating site profiles for site it0454...
+Validating site profiles for site it0490...
+Validating site profiles for site it0545...
+Validating site profiles for site it0352...
+
+*** RUNNING STEP: 05-set-drop-name-site-drop1 ***
+
+Using 'drop1' list from PARENT directory.
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+
+*** RUNNING STEP: 06-set-drop-name-site-drop2 ***
+
+Using 'drop2' list from PARENT directory.
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+
+*** RUNNING STEP: 07-refresh-DNS-zone-sites ***
+
+Using 'sites' output list from step: 04-validate-profiles-sites.
+OK:    6
+
+*** RUNNING STEP: 08-enable-drop-service-posadmins ***
+
+Using 'posadmins' list from PARENT directory.
+Running: [12 posadmins] 'enable-drop-service' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    12
+
+*** RUNNING STEP: 09-enable-drop-service-posclients ***
+
+Using 'posclients' list from PARENT directory.
+Running: [0 posclients] 'enable-drop-service' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+
+*** RUNNING STEP: 10-trim-old-releases-posservers ***
+
+Using 'posservers' output list from step: 01-ping-posservers.
+Running: [6 posservers] 'cleanup-repos-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 11-refresh-releases-and-images-current-posservers ***
+
+Using 'posservers' output list from step: 10-trim-old-releases-posservers.
+Running: [6 posservers] 'sync-repo-and-images-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 12-pre-redeploy-flight-check-posadmins ***
+
+Using 'posadmins' output list from step: 08-enable-drop-service-posadmins.
+Running: [12 posadmins] 'pre-redeploy-flight-check-posadmin' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    12
+
+*** RUNNING STEP: 13-pre-redeploy-flight-check-posclients ***
+
+Using 'posclients' output list from step: 09-enable-drop-service-posclients.
+Running: [0 posclients] 'pre-redeploy-flight-check-posclient' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+
+*** RUNNING STEP: 14-pre-redeploy-flight-check-posservers ***
+
+Using 'posservers' output list from step: 11-refresh-releases-and-images-current-posservers.
+Running: [6 posservers] 'pre-redeploy-flight-check-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 15-update-profiles-site ***
+
+Using 'sites' output list from step: 07-refresh-DNS-zone-sites.
+Validating profile names...
+Modifying site profiles for site it0377...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Modifying site profiles for site it0389...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Modifying site profiles for site it0454...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Modifying site profiles for site it0490...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Modifying site profiles for site it0545...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Modifying site profiles for site it0352...
+Delete: PROD-IT-01-BASE-R5
+Delete: PROD-IT-0400-EXTENDA-DEPENDENCY
+Delete: PROD-IT-0506-EFT-ADYEN
+Delete: PROD-IT-06-PLATFORM-4.3.9
+Using 'sites' output list from step: 07-refresh-DNS-zone-sites.
+Validating profile names...
+Modifying site profiles for site it0377...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Modifying site profiles for site it0389...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Modifying site profiles for site it0454...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Modifying site profiles for site it0490...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Modifying site profiles for site it0545...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Modifying site profiles for site it0352...
+Add: PROD-IT-01-BASE-R6
+Add: PROD-IT-0400-EXTENDA5-DEPENDENCY-R1
+Add: PROD-IT-0506-EFT-ADYEN-R3-PL5
+Add: PROD-IT-06-PLATFORM-5.2.3-TX120
+Add: PROD-IT-08-CITRIX-13.10
+Running CMDB diff-files...
+Running CMDB update-files...
+Refreshing dhcp server config
+Success!
+
+*** RUNNING STEP: 16-refresh-releases-and-images-new-posservers ***
+
+cat: profiles_new.list: No such file or directory
+Using 'posservers' output list from step: 14-pre-redeploy-flight-check-posservers.
+Running: [6 posservers] 'sync-repo-and-images-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 17-servicemode-enable-posservers ***
+
+Using 'posservers' output list from step: 16-refresh-releases-and-images-new-posservers.
+Running: [6 posservers] 'servicemode-enable-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 18-remove-PL43-repos-from-repo-posservers ***
+
+Using 'posservers' output list from step: 17-servicemode-enable-posservers.
+Running: [6 posservers] 'run-script-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 19-save-state-posservers ***
+
+Using 'posservers' output list from step: 18-remove-PL43-repos-from-repo-posservers.
+Running: [6 posservers] 'save-state-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 20-copy-db-backup-to-drop-posservers ***
+
+Using 'posservers' output list from step: 19-save-state-posservers.
+Running: [6 posservers] 'run-script-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 21-workaround-with-fade-bookpack-files-posservers ***
+
+Using 'posservers' output list from step: 20-copy-db-backup-to-drop-posservers.
+Running: [6 posservers] 'upload-to-host' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 22-workaround-unpack-fade-bookpack-files-posservers ***
+
+Using 'posservers' output list from step: 21-workaround-with-fade-bookpack-files-posservers.
+Running: [6 posservers] 'run-command-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 23-seed-redeploy-drops-posservers ***
+
+Using 'posservers' output list from step: 22-workaround-unpack-fade-bookpack-files-posservers.
+Running: [6 posservers] 'seed-redeploy-drops-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 24-validate-saved-state-posserver-posservers ***
+
+Using 'posservers' output list from step: 23-seed-redeploy-drops-posservers.
+Running: [6 posservers] 'validate-saved-state-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 25-seed-redeploy-drops-posadmins ***
+
+Using 'posadmins' output list from step: 12-pre-redeploy-flight-check-posadmins.
+Running: [12 posadmins] 'seed-redeploy-drops-posadmin' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    12
+
+*** RUNNING STEP: 26-seed-redeploy-drops-posclients ***
+
+Using 'posclients' output list from step: 13-pre-redeploy-flight-check-posclients.
+Running: [0 posclients] 'seed-redeploy-drops-posclient' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+
+*** RUNNING STEP: 27-validate-redeploy-posserver-drops-posadmins ***
+
+Using 'posadmins' output list from step: 25-seed-redeploy-drops-posadmins.
+Running: [12 posadmins] 'validate-redeploy-posserver-drops-posadmin' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    12
+
+*** RUNNING STEP: 28-validate-redeploy-posserver-drops-posclients ***
+
+Using 'posclients' output list from step: 26-seed-redeploy-drops-posclients.
+Running: [0 posclients] 'validate-redeploy-posserver-drops-posclient' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+
+*** RUNNING STEP: 29-prepare-cmdb-for-redeploy-posservers ***
+
+Using 'posservers' output list from step: 24-validate-saved-state-posserver-posservers.
+Running: [6 posservers] 'prepare-cmdb-for-posserver-redeploy-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+Refreshing dhcp server config
+Success!
+
+*** RUNNING STEP: 30-validate-deploy-mode-posservers ***
+
+Using 'posservers' output list from step: 29-prepare-cmdb-for-redeploy-posservers.
+Running: [6 posservers] 'validate-deploy-mode' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 31-deploy-state-set-posservers ***
+
+Using 'posservers' output list from step: 30-validate-deploy-mode-posservers.
+Running: [6 posservers] 'deploy-state-set-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 32-reboot-posservers ***
+
+Using 'posservers' output list from step: 31-deploy-state-set-posservers.
+Running: [6 posservers] 'reboot-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 33-check-imaged-posservers ***
+
+Sleeping for 5 minutes
+Using 'posservers' output list from step: 32-reboot-posservers.
+Running: [6 posservers] 'check_imaged_posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 34-validate-posservers ***
+
+Using 'posservers' output list from step: 33-check-imaged-posservers.
+Running: [6 posservers] 'validate-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 35-disable-majorupdate-posservers ***
+
+Using 'posservers' output list from step: 34-validate-posservers.
+Running: [6 posservers] 'run-script-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 36-extenda-trigger-major-update-posservers ***
+
+Using 'posservers' output list from step: 35-disable-majorupdate-posservers.
+Running: [6 posservers] 'extenda-trigger-major-update-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+
+*** RUNNING STEP: 37-restore-cmdb-after-redeploy-posservers ***
+
+Output already exists - aborting. Maybe you want to do './do.sh save'?
+
+Errors during step: 37-restore-cmdb-after-redeploy-posservers
+
+Aborting.
+
+
+Wed Nov  3 00:59:38 CET 2021
+
+==================== RUN COMPLETED ====================
+
+
+
+====================  RUN STARTED  ====================
+
+Wed Nov  3 01:03:30 CET 2021
+
+
+Info about last step that was run:
+
+  STEP:  36-extenda-trigger-major-update-posservers
+  OK:    6
+
+Choose one of the following options:
+
+1. Re-run failed items from the last step run: 36-extenda-trigger-major-update-posservers
+2. Resume from the next step: 37-restore-cmdb-after-redeploy-posservers
+
+Enter 1 or 2 to continue (anything else aborts):
+
+Continuing from step: 37-restore-cmdb-after-redeploy-posservers
+
+
+*** RUNNING STEP: 37-restore-cmdb-after-redeploy-posservers ***
+
+Using 'posservers' output list from step: 36-extenda-trigger-major-update-posservers.
+Running: [6 posservers] 'restore-cmdb-after-posserver-redeploy-posserver' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+Refreshing dhcp server config
+Success!
+
+*** RUNNING STEP: 38-disable-drop-service-posadmins ***
+
+Using 'posadmins' output list from step: 27-validate-redeploy-posserver-drops-posadmins.
+Running: [12 posadmins] 'disable-drop-service' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+OK:    12
+
+*** RUNNING STEP: 39-disable-drop-service-posclients ***
+
+Using 'posclients' output list from step: 28-validate-redeploy-posserver-drops-posclients.
+Running: [0 posclients] 'disable-drop-service' using NUM_PARALLEL=25, NUM_PARALLEL_PER_SITE=30...
+
+
+*** RUNNING STEP: 40-delete-drop-name-site-drop1 ***
+
+Using 'drop1' list from PARENT directory.
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+
+*** RUNNING STEP: 41-delete-drop-name-site-drop2 ***
+
+Using 'drop2' list from PARENT directory.
+OK:    6
+Running CMDB diff-files...
+Running CMDB update-files...
+
+real    4m54.279s
+user    5m9.031s
+sys     0m23.381s
+
+Wed Nov  3 01:08:25 CET 2021
+
