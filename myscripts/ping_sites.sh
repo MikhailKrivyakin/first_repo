@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function ping_till
 {				
 				ip=$(echo $1 | cut -c 39-50)
@@ -22,10 +21,15 @@ function ping_till
                 fi
 
 }
+export -f ping_till
+#gathering tills from selected sites
+for site in $(cat sites.list)
+    do
+        profuse unit show $site| grep Till > tills_IP.list
+    done
 
-
- export -f ping_till
 date
-profuse unit show $1| grep Till | parallel --no-notice ping_till {} |sort
+cat tills_IP.list | parallel --no-notice ping_till {}
+rm tills_IP.list; #remove trash
 
 
