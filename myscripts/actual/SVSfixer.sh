@@ -14,12 +14,12 @@ function check_svs {
 			#check again
 			profuse task run run-command-posclient $1 'Test-NetConnection 10.4.1.251 -Port 10113' > result_$1.tmp
 			#if problem persist then inform user	
-			if (( $(cat result.tmp |grep False |wc -l) > 0 )); then
+			if (( $(cat result_$1.tmp |grep False |wc -l) > 0 )); then
 					echo "There are some problems with adding firewall rules to the $1 . Please chek manualy in the error_svs_$1.log" 
 			else
 			#if OK - than inform user and delete profuse logs
 					echo "Rules for SVS connection  were added to the $1"
-					rm error_svs.log
+					rm error_svs_$1.log
 			fi
 		else 
 		#if OK than inform user

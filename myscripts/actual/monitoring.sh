@@ -4,13 +4,14 @@
 #	please enjoy, and feel free to contack me in case of any bugs
 #
 #
-
+function monitoring 
+{
 #check if WF was running
 if [ -e out-runlog.txt ]; then
 #_______________________________________________________________________________
 #check if WF was completed
 if [ $(tail out-runlog.txt |grep "RUN COMPLETED"|wc -l) -gt 0 ] && [ $(tail out-runlog.txt |grep "Errors" | wc -l) -eq 0 ]; then
-	echo -e "   									$1	WF monitoring v2 by Mikhail Krivyakin\n"
+	echo -e "   									$1	WF monitoring v2.1 by Mikhail Krivyakin\n"
 	echo -e "\n ------------------------------ Workflow finished, hope you have enjoyed it -----------------------------  "
 else
 #---------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ fi
 
 #############################################################################	
 	#display current step from out-runlog and title
-	echo -e "   								$1	WF monitoring v2 by Mikhail Krivyakin  "
+	echo -e "   								$1	WF monitoring v2.1 by Mikhail Krivyakin  "
 	echo -e " $(for (( i = 0; i < 37; i++ ))do echo -n "-"; done; ) Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps. $(for (( i = 63; i < 101; i++ ))do echo -n "-"; done; )\n"
 	echo -e " $(for (( i = 0; i < $(( 50-$title_chars_number)); i++ ))do echo -n "-"; done; ) $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') $(for (( i = $(( 50+$title_chars_number)); i < 101; i++ ))do echo -n "-"; done; )"
 
@@ -122,7 +123,7 @@ fi
 			else 
 				echo -e "\t_______ failed __________\t\n" >> other_errors #else it`s some kind of other error and needs invistigation
 				echo "$unit :" >> other_errors
-				tail *$current_step_number*/out-log/$unit.txt >>other_errors
+				tail *$current_step_number*/out-log/$unit.txt >>other_errors 2>/dev/null
 					
 			fi			
 			done
@@ -154,6 +155,9 @@ fi
 #_______________________________________________________________________________
 else
 	#if no outputs then message
-	echo -e "   							$1		WF monitoring v2 by Mikhail Krivyakin\n -------------------------------- Upgrade has not started yet -----------------------------  "
+	echo -e "   							$1		WF monitoring v2.1 by Mikhail Krivyakin\n -------------------------------- Upgrade has not started yet -----------------------------  "
 	
 fi	
+}
+export -f monitoring
+watch -d -n5  monitoring

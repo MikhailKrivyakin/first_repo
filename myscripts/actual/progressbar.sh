@@ -5,7 +5,8 @@
 #		If log file for current till wasnt changed in 10 minutes you`ll see Warning message
 #		please enjoy, and feel free to contack me in case of any bugs
 
-
+function progressbar
+{
 title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
 #check if WF was running
 if [ -e out-runlog.txt ]; then
@@ -17,7 +18,7 @@ if [ -e out-runlog.txt ]; then
 	step_percent=0
 	
 #title
-	echo -e "						Upgrade progress bar v1.4 by Mikhail Krivyakin"
+	echo -e "						Upgrade progress bar v1.5 by Mikhail Krivyakin"
 	echo -e " $(for (( i = 0; i < 37; i++ ))do echo -n "-"; done; ) Current step is: $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20) / $total_steps. $(for (( i = 63; i < 101; i++ ))do echo -n "-"; done; )\n"
 	echo -e " $(for (( i = 0; i < $(( 50-$title_chars_number)); i++ ))do echo -n "-"; done; ) $(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:') $(for (( i = $(( 50+$title_chars_number)); i < 101; i++ ))do echo -n "-"; done; )"
 		#progressbar display
@@ -147,10 +148,13 @@ rm steps.count.progress 2>/dev/null
 
 else
 	#if no outputs then message
-	echo -e "   									Upgrade progress bar v.1.4 by Mikhail Krivyakin\n--------------------------------Upgrade has not started yet-----------------------------  "
+	echo -e "   									Upgrade progress bar v.1.5 by Mikhail Krivyakin\n--------------------------------Upgrade has not started yet-----------------------------  "
 	
 fi
 
 #v 1.4.
 #	succesfull log searching algoritm added.
 ####
+}
+export -f progressbar
+watch -d -n5  progressbar
