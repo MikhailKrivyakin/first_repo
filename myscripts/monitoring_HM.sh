@@ -1,9 +1,6 @@
 #!/bin/bash
 #vars
-    current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
-    current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
-    total_steps=$(($(./status.sh |wc -l)-3))	# find total step number, using ./status output
-    title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
+   
 
 
 
@@ -118,7 +115,8 @@
 
 
 #check if WF was running
-
+function monitoring
+{
     if [ -e out-runlog.txt ]; then
         #_______________________________________________________________________________
         #check if WF was completed
@@ -126,7 +124,10 @@
             echo -e "   										WF monitoring v2.5 by Mikhail Krivyakin\n"
             echo -e "\n ------------------------------ Workflow finished, hope you have enjoyed it -----------------------------  "
         else
-
+            current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)
+            current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
+            total_steps=$(($(./status.sh |wc -l)-3))	# find total step number, using ./status output
+            title_chars_number=$(($(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:'|wc -m)/2))
             # title if it runned
             echo -e "   									WF monitoring v2.5 by Mikhail Krivyakin  "
             echo -e " $(for (( i = 0; i < 37; i++ ))do echo -n "-"; done; ) Current step is: $current_step_number / $total_steps. $(for (( i = 63; i < 101; i++ ))do echo -n "-"; done; )\n"
@@ -150,3 +151,9 @@ else
 	echo -e "   							$1		WF monitoring v2.5 by Mikhail Krivyakin\n -------------------------------- Upgrade has not started yet -----------------------------  "
 	
 fi	
+}
+export -f determinate_unit_type
+export -f counter
+export -f error_parser
+export -f monitoring
+watch -d -n5  monitoring

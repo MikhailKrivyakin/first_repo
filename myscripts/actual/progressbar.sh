@@ -123,8 +123,8 @@ fi
 					
 			#check for changes in 10 minutes and if file is not OK yet	
 				elif [[ $warning -eq 1 ]];then
-					echo -n "$till [$percents] WARNING!"
-					count_per_rows=$(($count_per_rows+1))
+							echo -n "$till [$percents] WARNING!"
+							count_per_rows=$(($count_per_rows+1))
 				else	
 					#display results and +1 for till in 1 row counter
 					echo -n "$till [$percents]		"

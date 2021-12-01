@@ -159,5 +159,7 @@ else
 	
 fi	
 }
+
+export -f
 export -f monitoring
-watch -d -n5  monitoring
+watch -d -n5  monitoring $1
