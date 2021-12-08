@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source _00-automation/packages_versions
 
 export SHELL=$(type -p bash)
 echo -e "\n\n Till:		|		Barclay		|		Globalblue		|		OPOS		|		Lockdown		|"

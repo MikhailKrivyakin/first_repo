@@ -2,7 +2,7 @@
 
 function ping_till
 {				
-				ip=$(echo $1 | cut -c 39-49)
+				ip=$(echo $1 | cut -c 39-50)
                 name=$(echo $1 | cut -c 1-11)
 				state="unknown"
 				result=$(ping -c 5 -W 5 $ip)
@@ -14,8 +14,8 @@ function ping_till
           
 			  	if [[ $(echo $state) == "UP"  &&  $(echo $result | grep DUP |wc -l) -gt 0 ]]; then
                         
-                       echo  "$name is up (Toshiba)"
-                        
+                            echo  "$name is up (Toshiba )"
+                                               
                 elif [[ $(echo $state) == "UP"  &&  $(echo $result | grep DUP |wc -l) -eq 0 ]]; then
                         
                         echo  "$name is up (Aptos)"
