@@ -5,6 +5,7 @@ function f_fix_lockdown
     if [ ! -e tills_wf/wf_$1/was_rebooted.txt ];then
         profuse task run run-command-posclient $1 "shutdown -r -t 0"    #reboot till if it wasnt rebooted yet
         echo $1 > tills_wf/wf_$1/was_rebooted.txt                       #create flag-file
+        sleep 120
         profuse task run ping-host $1 retry-until-success               #waiting for host to come back
         echo 1 |./tills_wf/wf_$1/run-steps.sh                           #re-run WF
         echo "Lockdown issue"
@@ -76,6 +77,6 @@ do
         } &>/dev/null
     sleep 5
 done
-echo "All till are ready for tests. Please check versions of critical packeges using ./fjpkg_check.sh and inform change manager."
+echo "All tills are ready for tests. Please check versions of critical packeges using ./fjpkg_check.sh and inform change manager."
 
 

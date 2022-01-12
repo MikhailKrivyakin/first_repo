@@ -6,7 +6,6 @@ $errors=@()
 
 $barclay_current=fjpkg q fujitsu-barclay-smartpay
 $gb_current=fjpkg q fujitsu-globalblue-windows
-#$opos_current=fjpkg q fujitsu-opos-drivers
 $lockdown_current=fjpkg q fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809
 #if block
     if ($barclay_current -like "*$barcklay_version_actual*")
@@ -46,6 +45,6 @@ $lockdown_current=fjpkg q fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LT
 #final check!
 if ($errors.count -gt 0)
 {
-  Throw "Error! Some of the packages have incorrent versions! Check and re-intasll manually"
+  Throw "Error! Some of the packages have incorrect versions! Check and re-intasll manually"
 
 }

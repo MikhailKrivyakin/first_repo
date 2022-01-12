@@ -17,64 +17,75 @@ do
         pos_mp="[ - ]"
         postpos_win_updates="[ - ]"
         prepl_mcafee="[ - ]"
-      
+        percents=0
     
     clear
-        echo -e "\n\n ------------------------------------- Rebuild of the till $1 in progress ------------------------------------- \n\n"
+    echo -e "\n\n ------------------------------------- Rebuild of the till $1 in progress ------------------------------------- \n\n"
     tail -n "+$(grep -n "Attempting deploy of POS-client: $1" /opt/fujitsu/log/deploy.log| tail -n1 | cut -d: -f1)" /opt/fujitsu/log/deploy.log |grep $1 > $1_logfile
-    currentsise=$(stat -c%s $1_logfile)
-    examplesize=46188
-    percents=$(($currentsise*100/$examplesize))	
-    echo -ne "\n[ $(for (( i = 0; i < $percents; i++ ))do echo -n "="; done; ) $(for (( i = $percents; i < 100; i++ ))do echo -n "-"; done; )]($percents%)"
+    
+    #currentsise=$(stat -c%s $1_logfile)
+    #examplesize=46188
+    #percents=$(($currentsise*100/$examplesize))	
     #if block
         if [ $(cat $1_logfile|grep "=> (item=fujitsu-mcafee-endpoint-security)"|wc -l) -gt 0 ]
             then 
                 prepl_mcafee="[OK]"
+                percents=9
         fi
         if [ $(cat $1_logfile|grep "=> (item=fujitsu-pgina)"|wc -l) -gt 0 ]
             then 
                 pl_pgina="[OK]"
+                percents=18
         fi
         if [ $(cat $1_logfile|grep " => (item=fujitsu-windows-lockdown-WINDOWS_10_ENTERPRISE_2019_LTSC_1809)"|wc -l) -gt 0 ]
             then 
                 pl_lockdown="[OK]"
+                percents=27
         fi
         if [ $(cat $1_logfile|grep "=> (item=fujitsu-platform-specification-windows)"|wc -l) -gt 0 ]
             then 
                 pl_specifications="[OK]"
+                percents=36
         fi
         if [ $(cat $1_logfile|grep " => (item=fujitsu-opos-cco)"|wc -l) -gt 0 ]
             then 
                 prepos_opos="[OK]"
+                percents=45
         fi
         if [ $(cat $1_logfile|grep " => (item=fujitsu-globalblue-windows)"|wc -l) -gt 0 ]
             then 
                 prepos_globalblue="[OK]"
+                percents=54
         fi
         if [ $(cat $1_logfile|grep "=> (item=fujitsu-ms-sql-server-express-2017)"|wc -l) -gt 0 ]
             then 
                 db_sql="[OK]"
+                percents=63
         fi
         if [ $(cat $1_logfile|grep "=> (item=fujitsu-ingenico-drivers)"|wc -l) -gt 0 ]
             then 
                 eft_ignico="[OK]"
+                percents=72
         fi
           if [ $(cat $1_logfile|grep "=> (item=fujitsu-barclay-smartpay)"|wc -l) -gt 0 ]
             then 
                 eft_barclay="[OK]"
+                percents=81
         fi
           if [ $(cat $1_logfile|grep "=> (item=marketplace-pos-till="|wc -l) -gt 0 ]
             then 
                 pos_mp="[OK]"
+                percents=90
         fi
           if [ $(cat $1_logfile|grep "=> (item=fujitsu-updates-windows-10-enterprise-2019-ltsc-1809-u2_2)"|wc -l) -gt 0 ]
             then 
                 postpos_win_updates="[OK]"
+                percents=100
         fi
 
 
 
-
+    echo -ne "\n[ $(for (( i = 0; i < $percents; i++ ))do echo -n "="; done; ) $(for (( i = $percents; i < 100; i++ ))do echo -n "-"; done; )]($percents%)"
     #display checkpoints
         echo -e "\n\nCheckpoints:\n --------------------------------------------------------------------------\n"
         echo -e "Pre-Platfromd fjpkg: \n McAffe                    $prepl_mcafee"
