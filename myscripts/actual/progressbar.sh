@@ -14,7 +14,7 @@ if [ -e out-runlog.txt ]; then
 	total_steps=$(($(./status.sh |wc -l)-3))
 	current_step_number=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1|cut -c 19-20)				#find current step number
 	current_step_name=$(cat out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')	#find current_step_name
-
+	accurate_step_name=$(echo $current_step_name | cut -c 3-)
 	step_percent=0
 	
 #title
@@ -81,19 +81,19 @@ fi
 					
 					currentsise=$(stat -c%s *$current_step_number*/out-log/$till.txt)								#current size
 					
-					if [ -e ../*upgrade-till-1/*$current_step_number*/out-log/$site*t001.txt ];then
-						examplesize=$(stat -c%s ../*upgrade-till-1/*$current_step_number*/out-log/$site*t001.txt) 	#example size, that was tooked from the 1st till in this store
+					if [ -e ../*upgrade-till-1/*$accurate_step_name*/out-log/$site*t001.txt ];then
+						examplesize=$(stat -c%s ../*upgrade-till-1/*$accurate_step_name*/out-log/$site*t001.txt) 	#example size, that was tooked from the 1st till in this store
 						percents=$(($currentsise*100/$examplesize))													#current percent
 					else 
 					################################################################################################################################
 					##			algoritm for finding tills log file in run-00* directories. in case there was few re-runs during upgrade of till 1
 					#################################################################################################################################
 						
-						run_number=$(ls -l ../*upgrade-till-1/*$current_step_number*/ |grep run |tail -1 | cut -c 48) #finding maximun run number
+						run_number=$(ls -l ../*upgrade-till-1/*$accurate_step_name*/ |grep run |tail -1 | cut -c 48) #finding maximun run number
 						for (( i=$run_number;i>0;i-- )) 															 # from the lates to newest run start searching for succesfull log file
 						do
-							if [ -e ../*upgrade-till-1/*$current_step_number*/run-00$i/out-log/$site*t001.txt ] && [ $(tail ../*upgrade-till-1/*$current_step_number*/run-00$i/out-log/$site*t001.txt | grep RET=0 | wc -l) -gt 0 ]; then
-								examplesize=$(stat -c%s ../*upgrade-till-1/*$current_step_number*/run-00$i/out-log/$site*t001.txt)	#calculating percents
+							if [ -e ../*upgrade-till-1/*$accurate_step_name*/run-00$i/out-log/$site*t001.txt ] && [ $(tail ../*upgrade-till-1/*$accurate_step_name*/run-00$i/out-log/$site*t001.txt | grep RET=0 | wc -l) -gt 0 ]; then
+								examplesize=$(stat -c%s ../*upgrade-till-1/*$accurate_step_name*/run-00$i/out-log/$site*t001.txt)	#calculating percents
 								percents=$(($currentsise*100/$examplesize))															#
 															
 							fi
@@ -157,4 +157,4 @@ fi
 ####
 }
 export -f progressbar
-watch -d -n5  progressbar
+watch -n5  progressbar

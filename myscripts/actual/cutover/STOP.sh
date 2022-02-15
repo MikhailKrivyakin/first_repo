@@ -2,17 +2,17 @@
 
 function f_kill_all
 {
-    cat posclients.list | parallel --no-notice "pkill {}.start"
+    cat posclients.list | parallel --no-notice "pkill -f {}"
 
 }
 
 case $1 in
-    "all")
+    all)
         f_kill_all
         echo "All Wfs for tills in poslients list has beenn killed. You can check by 'ps -all'"
         ;;
     *)
         
-        pkill $1.start
+        pkill -f $1
         echo "WF for till $1 has been killed. You can check by 'ps -all'"
 esac

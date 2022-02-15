@@ -21,7 +21,7 @@ do
     
     clear
     echo -e "\n\n ------------------------------------- Rebuild of the till $1 in progress ------------------------------------- \n\n"
-    tail -n "+$(grep -n "Attempting deploy of POS-client: $1" /opt/fujitsu/log/deploy.log| tail -n1 | cut -d: -f1)" /opt/fujitsu/log/deploy.log |grep $1 > $1_logfile
+    tail -n "+$(grep -a -n  "Attempting deploy of POS-client: $1" /opt/fujitsu/log/deploy.log| tail -n1 | cut -d: -f1)" /opt/fujitsu/log/deploy.log |grep $1 > $1_logfile
     
     #currentsise=$(stat -c%s $1_logfile)
     #examplesize=46188

@@ -7,7 +7,7 @@ if ! grep "^sys" out-runlog.txt > /dev/null; then
 fi
 
 if [ $(tail out-runlog.txt |grep "RUN COMPLETED"|wc -l) -gt 0 ] && [ $(tail out-runlog.txt |grep "Errors" | wc -l) -eq 0 ]; then
-   cat posclients.list >> ../../ready_tills.list             #mark till as ready
+    echo $1 >> ../../ready_tills.list             #mark till as ready
 fi
 ~
 ~
