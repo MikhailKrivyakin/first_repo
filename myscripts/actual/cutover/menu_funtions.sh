@@ -1,7 +1,8 @@
 function f_main_form  #main form
 {
-    clear
-    PS3="What do you want to do? "
+    
+    echo "WARNING!"
+    #PS3="What do you want to do? "
     select option in "Ping Stores from sites.list" "Check fjpkg at current tills from posclients.list" "Delete previos results" "Renew posclients.list" "quit" ;do
     case $option in
             "Ping Stores from sites.list")    
@@ -42,4 +43,4 @@ function f_ping_result
     done   
 
 }
-
+f_main_form
