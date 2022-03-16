@@ -40,18 +40,26 @@ function f_till_status
             fi
         fi
         #check if wf was stopped
-        if [ $(tail tills_wf/wf_$1/out-runlog.txt |grep "Aborting" | wc -l) -gt 0 ]; then                                                              
+        if [ -e tills_wf/wf_$1/*$current_step_name*/out-posclients-error.list ] && [ $(tail tills_wf/wf_$1/out-runlog.txt |grep "Aborting" | wc -l) -gt 0 ]; then                                                              
             state='Error!'			
             echo -e "$1 \n ----------------- \n" >> $1_errors.list      #print till errors
             #lockdown check
-            if [ "$(tail tills_wf/wf_$1/*$current_step_number*/out-log/$1.txt |grep "ensure template for 'locked' is applied as system"|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 
+            if [ "$(tail tills_wf/wf_$1/*$current_step_name*/out-log/$1.txt |grep "ensure template for 'locked' is applied as system"|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 
                 
                 state=$(f_fix_lockdown $1)      #lockdown issue fix
             else
                 tail tills_wf/wf_$1/$current_step_name/out-log/$1.txt >> $1_errors.list         
             fi
         fi
-         
+        #WinRm error check   
+        if [ -e tills_wf/wf_$1/*$current_step_name*/out-log/$1.txt ];then
+            time=$((`date +%s` - `date -r tills_wf/wf_$1/*$current_step_name*/out-log/$1.txt +%s`))   2>/dev/null     
+        
+            #check for changes in 10 minutes and if file is not OK yet				
+            if [ $time -gt 600 ] && [ $(cat tills_wf/wf_$1/*$current_step_name*/out-*-ok.list|grep $1|wc -l ) -eq 0 ] ; then
+                warning="Warning!"
+            fi
+        fi
           #till output
          if [ $(echo "$current_step_name"|grep "refresh-posclients" |wc -l) -gt 0 ];then
          {
@@ -60,9 +68,9 @@ function f_till_status
 			percents=$(($currentsise*100/$examplesize))
 
          }&>/dev/null
-            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]          [$percents]%"
+            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]          [$percents]%    $warning"
         else
-            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]"
+            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]  $warning"
          fi
                  
             

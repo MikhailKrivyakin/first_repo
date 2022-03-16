@@ -8,15 +8,18 @@
     destin_folder: C:\temp\
 
   tasks:
+        - name: Gatherhost name
+          win_shell: Write-host "$env:computername -Nonewline"
+          register: hostName
         - name: Copy private SCOM sert to remote host
           win_copy:
-            src: {{ source_folder }}{{ ansible_hostname }}.pfx
-            dest: {{ destin_folder }}{{ ansible_hostname }}.pfx 
+            src: {{ source_folder }}{{ hostName }}.pfx
+            dest: {{ destin_folder }}{{ hostName }}.pfx 
         - name: Copy Primark cert to remote host
           win_copy:
             src: {{ source_folder }}Primark.ie.cer
             dest: {{ destin_folder }}Primark.ie.cer
-        - name: Execute script  on remote host
+        - name: Execute SCOM register scipt
           win_shell: |
                   Import-Module PKI
                   $hostname = [System.Net.Dns]::GetHostName()
@@ -43,14 +46,50 @@
                   Start-Sleep -Seconds 2
                   $pwd =  [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
                   C:\opt\app\fujitsu-scom-agent\MOMCertImport.exe $expPfxPath /Password $pwd
-        - name: Gathering info about cerfificate from registry
-          win_shell: |
+                  Get-Service "HealthService" | Restart-service -Force
+
                   $registry=Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft Operations Manager\3.0\Machine Settings" |Select-Object -ExpandProperty ChannelCertificateHash
                   $sn=GCI -Path Cert:\LocalMachine\My | Where-Object {($_.Subject -match $env:COMPUTERNAME) -and ($_.Issuer -notmatch "FujitsuRoot")}; 
-                  Write-host $regisry
-                  Write-host $sn.thumbprint
+                  Write-host "Please compare 2 strings below. They should be simular"
+                  Write-host "Registry key - $regisry"
+                  Write-host "Vault    key - $sn.thumbprint
           register: regisry
-      
+        - name: execute AddScommanagemt gropu script
+          win_shell: |
+                    Param(
+            [Parameter(Mandatory=$false)]
+            [string]$ManagementServer = "IECWXWVPOMX001.Primark.local",
+
+            [Parameter(Mandatory=$false)]
+            [string]$MGMTGroupName = "Primark_SCOM",
+
+            [Parameter(Mandatory=$false)]
+            [int]$Port = "5723"
+          )
+
+          $ErrorActionPreference='Stop'
+
+          Write-Warning "This will restart the agents health service"
+
+          #Adding MG to the agent
+          try{
+          $Agent = New-Object -ComObject AgentConfigManager.MgmtSvcCfg
+          $Agent.AddManagementGroup("$MGMTGroupName", "$ManagementServer", "$Port")}
+
+          catch{
+          CLS
+          Write-host "An error occured please se exeption message:"
+
+          Write-error $_.Exception.Message
+          BREAK
+          }
+
+          get-service HealthService | Restart-Service
+
+          Write-Host "Agent connected to the following management groups"
+          $Agent.GetManagementGroups()
+     
+
         - name: Display output
           debug:
             msg: {{ registry.stdout_lines }}}

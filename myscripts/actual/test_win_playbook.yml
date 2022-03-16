@@ -1,0 +1,27 @@
+---
+- hosts: win_server1
+  gather_facts: no
+  
+
+  
+  tasks:
+     - name: Ping server
+       win_ping:
+
+     - name: Execute shell script
+       win_shell: |
+        try{
+                        Write-host "$env:computername" -nonewline
+                  }
+                  catch{
+                          pwd
+                  }
+       register: output
+     - name: copy file
+       win_copy:
+         src: /home/ec2-user/ansible/{{ output.stdout }}_to_copy.txt 
+         dest: C:\temp\
+     - name: Print result
+       debug:
+          msg: "{{ output.stdout }}"
+    

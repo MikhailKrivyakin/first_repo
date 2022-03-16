@@ -1,8 +1,6 @@
 #!/bin/bash
 
-touch $1_logfile
-till_number=$(echo $1)
-percents=0
+
 function f_get_package_state
 {
 display_name=$(echo $1 |cut -d '|' -f 1)
@@ -20,9 +18,14 @@ dim=$((35-$(echo $display_name| wc -c)))
 
 }
 export -f f_get_package_state
-while [ $(cat $1_logfile |grep "mark host as deployed"|wc -l ) -lt 1 ]
-do
-    clear
+function f_main
+{
+#while [ $(cat $1_logfile |grep "mark host as deployed"|wc -l ) -lt 1 ]
+#do
+touch $1_logfile
+till_number=$(echo $1)
+percents=0
+    #clear
     echo -e "\n\n ------------------------------------- Rebuild of the till $1 in progress ------------------------------------- \n"
     tail -n "+$(grep -a -n  "Attempting deploy of POS-client: $1" /opt/fujitsu/log/deploy.log| tail -n1 | cut -d: -f1)" /opt/fujitsu/log/deploy.log |grep $1 > $1_logfile
     #declare fjpkg repos arrays
@@ -46,5 +49,9 @@ do
     done 
     echo -ne "\n[ $(for (( i = 0; i < $percents; i++ ))do echo -n "="; done; ) $(for (( i = $percents; i < 100; i++ ))do echo -n "-"; done; )]($percents%)\n\n"
     sleep 5
-done
-echo "Rebuild of the till $1 ended"
+#done
+#echo "Rebuild of the till $1 ended"
+}
+
+export -f f_main
+watch -n5 -t f_main $1
