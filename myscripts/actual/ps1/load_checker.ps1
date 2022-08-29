@@ -1,6 +1,6 @@
 $CPUload=(Get-WmiObject Win32_Processor).LoadPercentage 
 $RAMload=(Get-WMIObject Win32_OperatingSystem).FreePhysicalMemory/1kb
-Write-host "CPU Usage:$CPUload%. | Free Memory:$RAMload MB"
+Write-host "CPU Usage: $CPUload%. | Free Memory: $RAMload MB"
 echo "_________________________________________________"
 
 If ($CPUload -gt 80 -or $RAMload -lt 6000)

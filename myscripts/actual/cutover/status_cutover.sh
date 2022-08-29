@@ -16,6 +16,8 @@ function f_fix_lockdown
 
 }
 
+
+
 function f_till_status
 {
     state="[Disconnected]      |"    #state by default
@@ -24,7 +26,7 @@ function f_till_status
    #check if wf was started
    if [ -e tills_wf/wf_$1/out-runlog.txt ];then
         current_step_name=$(cat tills_wf/wf_$1/out-runlog.txt | grep "RUNNING STEP"| tail -1| tr -d '*** RUNNING STEP:')
-        dim=$((35-$(echo $current_step_name |wc -c)))
+        dim=$((40-$(echo $current_step_name |wc -c)))
          #check if till is reacheble via profuse
         {
         if  [ $(cat tills_wf/wf_$1/01-wait-connect-posclients/out-posclients-ok.list |grep $1 |wc -l) -gt 0 ];then

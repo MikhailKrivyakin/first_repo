@@ -49,6 +49,13 @@ case $country in
         f_packeges_to_repos
         [ ! -f /opt/fujitsu/profuse/zonemaster/data/cm/releases/4.6.3/repos/WINDOWS-SITE-POSCLIENT-Platform-Updates/fjpkg/x64/fujitsu-globalblue-windows-1.2011.2696_2.x64.7z ] && cp ./fujitsu-globalblue-windows-1.2011.2696_2.x64.7z /opt/fujitsu/profuse/zonemaster/data/cm/releases/4.6.3/repos/WINDOWS-SITE-POSCLIENT-Platform-Updates/fjpkg/x64/ && echo "Globalblue v 2011 package was added to repo 4.6.3" || echo "Globalblue package is OK in repo 4.6.3"
         f_create_repo
+        ;;
+
+    "si")
+        echo "Country is $country"
+        f_packeges_to_repos
+        [ ! -f /opt/fujitsu/profuse/zonemaster/data/cm/releases/4.6.3/repos/WINDOWS-SITE-POSCLIENT-Platform-Updates/fjpkg/x64/fujitsu-globalblue-windows-1.2011.2696_4.x64.7z ] && cp ./fujitsu-globalblue-windows-1.2011.2696_4.x64.7z /opt/fujitsu/profuse/zonemaster/data/cm/releases/4.6.3/repos/WINDOWS-SITE-POSCLIENT-Platform-Updates/fjpkg/x64/ && echo "Globalblue v 2011 package was added to repo 4.6.3" || echo "Globalblue package is OK in repo 4.6.3"
+        f_create_repo
   ;;
     *)
         echo "Country is $country"
