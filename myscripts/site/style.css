@@ -1,0 +1,140 @@
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: silver
+  
+}
+img {
+  width: 100%;
+  height: 100%;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+
+.header {
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: darkred;
+}
+
+.header_logo {
+
+color: inherit;
+text-decoration: none;
+
+}
+.hero {
+
+min-height: 100vh;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.container {
+  max-width: 1230px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 5px;
+}
+.hero_container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  grid-gap: 20px;
+}
+.hero_about {
+display:flex;
+flex-direction: column;
+justify-content: center;
+box-shadow: 2px 5px 10px rgba(0,0,0,0);
+font-weight: 500;
+}
+.hero_title{
+margin-bottom: 10px;
+font-size: 48px;
+line-height: 1.1;
+}
+.hero_subtitle{
+  font-size: 32px;
+  font-weight: 400;
+}
+.hero_links {
+  display: flex;
+  }
+.hero_link{
+  margin-right: 10px;
+  font-size: 30px;
+  color: black;
+  transition: color 0.3ms;
+}
+.hero_link:hover{
+  color: blue
+}
+
+.hero_box{
+  max-width: 500px;
+  justify-self: center;
+  overflow: hidden;
+  border: 10px solid #fff;
+
+  background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+
+  animation: ava-animate 5s infinite alternate;
+  box-shadow: 2px 5px 10px rgba(0, 0, 0, .5);
+}
+
+.hero_box_img{
+animation: ava-bg 3s infinite   alternate ;
+}
+@keyframes ava-animate {
+  0% {
+    border-radius: 62% 38% 72% 28% / 67% 32% 68% 33%;
+  }
+
+  40% {
+    border-radius: 37% 63% 53% 47% / 67% 32% 68% 33%;
+  }
+
+  60% {
+    border-radius: 23% 77% 39% 61% / 78% 54% 46% 22%;
+  }
+
+  100% {
+    border-radius: 18% 82% 24% 76% / 43% 54% 46% 57%;
+  }
+}
+
+@keyframes ava-bg {
+  from {
+    backdrop-filter: hue-rotate(0);
+  }
+
+  to {
+    backdrop-filter: hue-rotate(90deg);
+  }
+}
+
+@media screen and (max-width: 978){
+  .hero {padding-top: 30px;}
+  .hero_container {grid-row-gap: 20px;}
+  .hero_title {font-size: 28px; margin-bottom: 10px;}
+  .hero_subtitle {font-size: 22px; font-weight: 400;}
+  .hero_description {font-size: 14px; }
+  .hero_about {text-align: center;}
+  .hero_links {justify-content: center;}
+  .hero_box {max-width: 350px;;}
+}

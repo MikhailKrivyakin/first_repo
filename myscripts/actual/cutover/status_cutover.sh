@@ -17,9 +17,24 @@ function f_fix_lockdown
 }
 
 
+function f_reconfig_gb
+{
+    attempts_count=0
+    while [ $(cat tills_wf/wf_$1/*reconfig-gb-posclients/out-posclients-ok.list |grep -c $1)  -eq 0  ]
+    do
+          echo 1|  ./tills_wf/wf_$1/$1.start.sh >> logfile &
+          attempts_count=$(($attempts_count+1))
+          echo "Atempt #$attempts_count            |"
+    done
+
+}
+
+
+
 
 function f_till_status
 {
+    attempts_count=0
     state="[Disconnected]      |"    #state by default
     percents="-"
     step_count=$(($(tills_wf/wf_$1/status.sh |wc -l)-3))
@@ -41,14 +56,25 @@ function f_till_status
                     echo  $1 >>ready_tills.list             
             fi
         fi
+        attempts_count=''
         #check if wf was stopped
         if [ -e tills_wf/wf_$1/*$current_step_name*/out-posclients-error.list ] && [ $(tail tills_wf/wf_$1/out-runlog.txt |grep "Aborting" | wc -l) -gt 0 ]; then                                                              
-            state='Error!'			
+            state='Error!              |'			
             echo -e "$1 \n ----------------- \n" >> $1_errors.list      #print till errors
             #lockdown check
             if [ "$(tail tills_wf/wf_$1/*$current_step_name*/out-log/$1.txt |grep "ensure template for 'locked' is applied as system"|wc -l)" -gt 0 ] && [ $(echo "$current_step_name"|grep refresh |wc -l) -gt 0 ]; then 
                 
                 state=$(f_fix_lockdown $1)      #lockdown issue fix
+            elif [ "$(tail tills_wf/wf_$1/*$current_step_name*/out-log/$1.txt |grep -c "were not successfully verified to global blue servers")" -gt 0 ] && [ $(echo "$current_step_name"|grep -c "reconfig-gb-posclients")  -gt 0 ]; then
+                
+                
+                   
+                     echo 1|  ./tills_wf/wf_$1/$1.start.sh >> logfile &
+                     attempts_count=$(($attempts_count+1))
+                     state="Atempt #$attempts_count            |"
+                      
+                    
+                    
             else
                 tail tills_wf/wf_$1/$current_step_name/out-log/$1.txt >> $1_errors.list         
             fi
@@ -70,7 +96,9 @@ function f_till_status
 			percents=$(($currentsise*100/$examplesize))
 
          }&>/dev/null
-            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]          [$percents]%    $warning"
+            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]          [$percents]%    $warning  "
+        elif [ $(echo "$current_step_name"|grep -c "reconfig-gb-posclients" ) -gt 0 ];then
+            echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]  $warning    $attempts_count"   
         else
             echo -e "$1 |    $state     [$current_step_name] $(for (( i = 0; i < $dim; i++ ))do echo -n " "; done; )/[$step_count]  $warning"
          fi

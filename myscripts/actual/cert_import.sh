@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ -e /root/certs/$1.pfx  ]; then
+	echo -e "\n ------------------------------------"
 	echo "Copying certs to the server"
 	/opt/fujitsu/profuse/zonemaster/tasks/ansible/ansible2_site.sh $1 -m win_copy -a "src=/root/certs/$1.pfx dest=c:/temp/" >>${1}_output.txt
 	/opt/fujitsu/profuse/zonemaster/tasks/ansible/ansible2_site.sh $1 -m win_copy -a 'src=/root/certs/Primark.ie.cer dest=c:/temp/'>>${1}_output.txt
@@ -28,6 +29,7 @@ if [ -e /root/certs/$1.pfx  ]; then
 	rm *.output_$1 2>/dev/null
 
 	echo "Done! You can see output of the commands in output.txt file"
+	echo -e "------------------------------------\n"
 else 
 	echo "No personal certificate found. Please contact HCL team and upload it to /root/certs/"
 fi
