@@ -1,0 +1,12 @@
+[Unit]
+Description=my_service_for_test
+
+[Service]
+User=mikhail
+ExecStart=/home/mikhail/Документы/GitHub/first_repo/new/test.sh
+RestartSec=30s
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
