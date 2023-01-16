@@ -1,0 +1,284 @@
+#!/bin/bash
+
+dir="/opt/voicetech"
+tmp="/tmp/voicetech"
+
+function buildMRCP {
+    tar -xf  "$tmp/mrcp.tar.gz" --directory="$tmp"
+    cd "$tmp/unimrcp"
+    ./build-dep-libs.sh -s
+    ./bootstrap
+    ./configure
+    make
+    make install
+    cd ..
+    cd asterisk-unimrcp
+    ./bootstrap
+    ./configure
+    make install
+}
+
+function copyKeys {
+    tar -xzf  "$tmp/keys.tar.gz" --directory="$tmp"
+    rm -f -R /etc/asterisk/keys/*
+    cp -f $tmp/asterisk.pem /etc/asterisk/keys/
+    cp -f $tmp/asterisk.key /etc/asterisk/keys/
+    chmod 600 /etc/asterisk/keys/*
+    chown asterisk:asterisk /etc/asterisk/keys/*
+}
+
+function copyFiles {
+    mkdir -p /opt/voicetech/integrations/internal /opt/voicetech/config
+    cp -f $tmp/config/* /opt/voicetech/config/
+    cp -f $tmp/integrations/internal/* /opt/voicetech/integrations/internal/
+    chmod +x /opt/voicetech/integrations/internal/*
+}
+
+function makeDirs {
+    mkdir -p /etc/asterisk/scripts \
+             /etc/asterisk/keys/ \
+             /usr/share/asterisk/sounds/cache \
+             /usr/share/asterisk/sounds/voice \
+             /usr/share/asterisk/sounds/record \
+             /usr/share/asterisk/sounds/ulaw \
+             /opt/voicetech/autoprovision
+    chown -R asterisk:asterisk /etc/asterisk/
+    chown -R asterisk:asterisk /usr/share/asterisk/sounds/
+    chmod -R 777 /opt/voicetech/autoprovision
+}
+
+
+function setupMariaDBonlyClient {
+
+cat >/etc/yum.repos.d/mariadb.repo <<EOL
+[MariaDB]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOL
+
+yum -y install MariaDB-client
+}
+
+function installCentosMariaDB {
+echo ======================= installing MariaDB for Centos =======================
+Num=`yum list installed | grep -iF "mariadb-server." | wc -l`
+#echo ${Num}
+
+if [ ${Num} -eq 0 ]
+    then
+#	#setting both MariaDBs client and server
+	setupMariaDBonlyClient
+    else # the server is installed
+	Num=`yum list installed | grep -iF "mariadb-client." | wc -l`
+	if [ ${Num} -ge 0 ]
+	    then
+		echo MariaDB client and server are already installed!
+	    else
+		Version=`yum list installed | grep -iF "mariadb-server." | ( read packageName packageVersion rest ; echo ${packageVersion} )`
+		Values=`echo ${Version} | tr '.-' '  '`
+		ValArr=( $Values )
+		RequiredMajorVersion=${ValArr[0]}
+		echo -n Setup requires MariaDB client with major version \"${RequiredMajorVersion}\"
+		NumAll=`yum list available | grep -iF "mariadb-client." | wc -l`
+		Num=`yum list available | grep -iF "mariadb-client." | grep -iF " ${RequiredMajorVersion}." | wc -l`
+		if [ ${NumAll} -ge 2 ]
+		    then
+			if [ ${Num} -ge 1 ]
+			    then
+				echo " but not only such version available now. Please install MariaDB-client manually!"
+			    else
+				echo " but such version is not available now between some others!"
+			fi
+		    else
+			if [ ${Num} -ge 1 ]
+			    then
+				echo " and intstalling it."
+				yum install -y MariaDB-client
+			    else
+				echo " but there is no MariaDB-client available!"
+			fi
+		fi
+	fi
+fi
+}
+
+function installCentos {
+
+    echo 'Установка окружения centos'
+    yum update -y
+    yum install -y epel-release yum-utils
+    rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    yum-config-manager --enable remi
+    yum-config-manager --enable remi-php73
+    rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+    yum install -y python3 python36-mysql.x86_64 python36-mysql-debug.x86_64 python3-requests python3-mysql \
+                   php php-mbstring ffmpeg jq lame sox xmlstarlet \
+                   wget tftp tftp-server xinetd yum-plugin-versionlock
+
+    echo 0 > /sys/fs/selinux/enforce
+    sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+    sed -i 's/SELINUX=permissive/SELINUX=disabled/g' /etc/selinux/config
+
+    installCentosMariaDB
+
+    wget https://ast.tucny.com/repo/tucny-asterisk.repo -O /etc/yum.repos.d/tucny-asterisk.repo
+    rpm --import https://ast.tucny.com/repo/RPM-GPG-KEY-dtucny
+    rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+    wget http://repo.mysql.com/mysql80-community-release-el7.rpm                # добавление репозитозитория для установки новой версии ODBC коннектера,
+    rpm -Uvh mysql80-community-release-el7.rpm                                  # содержащего нужные библиотеки.
+    
+
+    yum-config-manager --enable asterisk-16
+    yum-config-manager --enable asterisk-common
+
+    yum install -y asterisk asterisk-sounds-core-ru asterisk-sip asterisk-sounds-core-ru-alaw \
+                   asterisk-sounds-core-en asterisk-sounds-core-en-alaw asterisk-mysql \
+                   mysql ocaml-csv  unixODBC  unixODBC-devel libtool-ltdl \
+                   libtool-ltdl-devel asterisk-odbc \
+                   asterisk-devel git automake libtool gcc-c++
+    yum --enablerepo=mysql-connectors-community install -y mysql-connector-odbc     #установка последней версии ODBC коннектера
+    makeDirs
+    copyKeys
+    copyFiles
+
+    sed -i 's/\/var\/lib\/tftpboot/\/opt\/voicetech\/autoprovision/g' /etc/xinetd.d/tftp
+    sed -i 's/disable\t\t\t= yes/disable\t\t\t= no/g' /etc/xinetd.d/tftp
+
+    buildMRCP
+    cp -u -v /usr/lib/asterisk/modules/* /usr/lib64/asterisk/modules/
+}
+
+function create_odbc_config_files {
+#функция создания конфиг файлов коннектра ODBC
+
+    ConfigFile='/opt/voicetech/config/mysql.conf'
+
+    if [ -f ${ConfigFile} ]; then
+        sql_conf=${ConfigFile}
+        sql_server=`jq -r .host $sql_conf`
+        sql_user=`jq -r .user $sql_conf`
+        sql_pass=`jq -r .pass $sql_conf`
+
+        echo "[VTMySQL] 
+enabled=yes
+dsn=VTMySQL
+pre-connect=yes
+username=${sql_user}
+password=${sql_pass}
+forcecommit=no
+isolation=repeatable_read
+connect_timeout=3" > /etc/asterisk/res_odbc.conf #создание файла с данными для астера
+
+echo "[MySQL ODBC 8.0 Unicode Driver]
+Driver=/usr/lib64/libmyodbc8w.so
+UsageCount=1
+
+[MySQL ODBC 8.0 ANSI Driver]
+Driver=/usr/lib64/libmyodbc8a.so
+UsageCount=1">>/etc/odbcinst.ini #дописывание драйверов в стандартный конфиг ODBC коннектера
+
+echo "[VTMySQL]
+driver=/usr/lib64/libmyodbc8a.so
+server=$sql_server
+database=voicetech
+Port=3306
+readtimeout=2
+writetimeout=2
+option=3
+charset=utf8
+" >/etc/odbc.ini #созадние конфига для ODBC коннектера
+    else
+        echo "_________________________________________
+Внимание! На момент выполнения установки не был заполнен файл /opt/voicetech/config/mysql.conf!
+Данные для ODBC коннектера к базе нужно заполнить вручную в файлах:
+res_odbc.conf
+/etc/odbc.ini
+/etc/odbcinst.ini
+"
+    fi
+}
+
+function installPackages {
+
+    if [ -f "/etc/redhat-release" ]; then
+        installCentos
+       return
+    fi
+
+    if [ -f "/etc/redos-release" ]; then
+        echo "Поддерживается только CentOS"
+        exit;
+    fi
+
+    if [ -f "/etc/os-release" ] && [ $(cat /etc/os-release|grep -ic alt) -ne 0 ]; then
+        echo "Поддерживается только CentOS"
+        exit;
+    fi
+
+    if [ -f "/etc/os-release" ] && [ $(cat /etc/os-release|grep -ic ubuntu) -ne 0 ]; then
+        echo "Поддерживается только CentOS"
+        exit;
+    fi
+
+    if [ -f "/etc/os-release" ] && [ $(cat /etc/os-release|grep -ic astra) -ne 0 ]; then
+        echo "Поддерживается только CentOS"
+        exit;
+    fi
+
+    if [ -f "/etc/debian_version" ]; then
+        echo "Поддерживается только CentOS"
+        exit;
+    fi
+}
+
+PAYLOAD_LINE=$(awk '/^__PAYLOAD_BEGINS__/ { print NR + 1; exit 0; }' $0)
+
+echo "Установка Flora Voice Server..."
+
+echo "Удаление старых файлов"
+if [ -d "$dir" ]; then
+    rm -fR "$dir/integrations/online/assistant.py" &> /dev/null
+    rm -fR "$dir/integrations/online/biometry.sh" &> /dev/null
+    rm -fR "$dir/integrations/online/functions.sh" &> /dev/null
+    rm -fR "$dir/integrations/online/isTime.sh" &> /dev/null
+    rm -fR "$dir/config/paths.conf.example" &> /dev/null
+    rm -fR "$dir/config/mysql.conf.example" &> /dev/null
+    rm -fR "$dir/config/dict.conf.example" &> /dev/null
+    rm -fR "$dir/config/integrations.conf.example" &> /dev/null
+    rm -fR "$dir/config/wss.conf.example" &> /dev/null
+else
+    mkdir -p "$dir"
+fi
+
+mkdir -p "$tmp"
+
+echo "Распаковка библиотек"
+tail -n +${PAYLOAD_LINE} $0 | base64 -d | tar -xzf - --directory="$tmp"
+
+if [ "$?" != "0" ]; then
+  echo "Ошибка установки, архив поврежден"
+  exit
+fi
+
+installPackages
+create_odbc_config_files
+
+echo "Установка успешно завершена.
+Не забудьте открыть доступ к портам 5060,10000-20000/udp,
+Если требуется tftp, то порт 69/udp,
+а также прописать необходимые настройки в файлах (каталог /opt/voicetech/config/):
+mysql.conf
+dict.conf
+paths.conf
+integrations.conf
+wss.conf
+
+Запуск/остановка сервера осуществляется через сервисы:
+asterisk
+tftp
+xinetd"
+
+exit 0
+__PAYLOAD_BEGINS__

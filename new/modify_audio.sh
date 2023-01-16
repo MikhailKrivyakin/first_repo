@@ -26,14 +26,14 @@ file 'tmp_segment3_current_voice_$filename'
     duration_original=`mediainfo $file --Inform="General;%Duration%" {}`
     f_convert_audio $file voice $duration_original
     noise_file=`find ./$noise_dir -type f | ( i=0; while read line; do lines[i++]="$line"; done; echo "${lines[$RANDOM % $i]}" )` #выбираем случайный файл с шумом 
-     ####################место под функцию обработки громкости #########################
-    f_сut_audio "current_voice_$filename" "$duration_original" "cut"
-    f_сut_audio "current_voice_$filename" "$duration_original" "wave"
+    f_сut_audio "current_voice_$filename" "$duration_original" "cut"    #передаем текущий файл на "выкусывание" кусков звука
+    f_сut_audio "current_voice_$filename" "$duration_original" "wave"   #передаем текущий файл на ускорение/замедление и изменение громкости
     duration_current=`mediainfo current_voice_$filename --Inform="General;%Duration%" {}`
-    f_convert_audio "${noise_file:2}" "noise" "$duration_current"
-    ffmpeg -v 0 -y -i current_voice_$filename -i current_noise_$filename -filter_complex "[1][0]amerge=inputs=2[a]" -map "[a]" -ac 1 current_ready_$filename 2>>log.file
-    sox current_ready_$filename -r 8000 -b 16 -c 1 output/$dictor/$filename bandpass 1500 2400 2>>error.log
-    [ `echo $?` -ne 0 ] && echo -e "This file had a problem during sox command:\n $file\n" >>error.log #запись имени проблемных файлов в лог
+    f_convert_audio "${noise_file:2}" "noise" "$duration_current" #обрезка и преобразование текущего файла с шумом
+    #слияние голосового и файла шума в один:
+    ffmpeg -v 0 -y -i current_voice_$filename -i current_noise_$filename -filter_complex "[1][0]amerge=inputs=2[a]" -map "[a]" -ac 1 current_ready_$filename 2>>log.file 
+    sox current_ready_$filename -r 8000 -b 16 -c 1 output/$dictor/$filename bandpass 1500 2400 2>>error.log #финальная обработка
+    [ `echo $?` -ne 0 ] && echo -e "This file had a problem during sox command:\n $file\n" >>error.log    #запись имени проблемных файлов в лог
     rm current_*_$filename* list_$filename.txt   2>/dev/null                                              #удаляем текущие файлы в конце итерации
     cp `echo ${file%%.wav}`.txt ./output/`echo ${file%%.wav}`.txt                                         #перемещение соотвествующего текстового файла в директорию
    
