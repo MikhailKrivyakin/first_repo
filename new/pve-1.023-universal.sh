@@ -453,12 +453,16 @@ function install_pve {
       filename_setuptools=`ls -A | grep setuptools-*.whl`
       # получить имя установочного пакета Cython
       filename_cython=`ls -A | grep Cython-*.whl`
+      # получить имя установочного пакета pytest_runner
+      filename_runner=`ls -A | grep pytest_runner-*.whl`
       # установить отдельно пакет pip3 (не ставится из общей массы)
       pip3 install $filename_pip3 --no-index --find-links '.'
       # установить отдельно пакет setuptools (не ставится из общей массы)
       pip3 install $filename_setuptools --no-index --find-links '.'
       # установить отдельно пакет Cython (не ставится из общей массы)
       pip3 install $filename_cython --no-index --find-links '.'
+      # установить отдельно пакет pytest_runner (не ставится из общей массы)
+      pip3 install $filename_runner --no-index --find-links '.'
       # установить всю общую массу модулей
       pip3 install -r requirements.txt --no-index --find-links '.'
     deactivate
