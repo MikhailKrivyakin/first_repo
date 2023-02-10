@@ -1,0 +1,87 @@
+---
+- name: Deploy PVE on host
+  hosts: deb
+  become: yes
+
+  vars: 
+    pve_folder: /opt/pve
+
+  tasks:
+    - name: APT update
+      shell: "apt update"
+
+    - name: Install system packages
+      apt:
+        name: 
+          - gcc
+          - g++
+          - cpp
+          - curl
+          - git
+          - patch
+          - cmake
+          - build-essential
+          - apt-transport-https
+          - gnupg2
+          - mc
+        state: present
+    
+    - name: Install main packages
+      apt:
+        name:
+          - python3-pip
+          - python3-dev
+          - libsndfile1
+          - python3-wheel
+          - python3-venv
+          - rustc
+          - cargo
+          - openssl
+          - libssl-dev
+          - libffi-dev
+          - zlib1g
+          - zlib1g-dev
+          - bzip2
+          - libbz2-dev
+          - libxml2
+          - libxml2-dev
+          - xmlsec1
+          - libxmlsec1-dev
+          - readline-common
+          - libreadline-dev
+          - sqlite3
+          - libsqlite3-dev
+          - xz-utils
+          - lzma
+          - liblzma-dev
+          - ffmpeg
+        state: present
+
+    - name: Create pve folder
+      file:
+        name: "/opt/cve"
+        state: directory
+    - name: Install pyenv
+      shell: |
+        curl https://pyenv.run | bash
+        export PYENV_ROOT="$HOME/.pyenv"
+        command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+        pyenv install -s -k 3.9.16        
+        cd /opt/cve
+        pyenv local 3.9.16
+        python3 -m venv "{{ pve_folder }}"
+
+    - name: Install venv module
+      pip:
+        name: virtualenv
+
+    - name: Initiate PVE
+      pip:
+        virtualenv: "{{ pve_folder }}"
+        requirements: /root/freeze.txt
+
+
+
+
+

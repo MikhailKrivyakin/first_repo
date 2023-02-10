@@ -1,0 +1,7 @@
+---
+- name: Deploy role PVE
+  hosts: deb
+  become: yes
+
+  roles:
+          - {role: debian-pve, when: ansible_system == 'Linux'}

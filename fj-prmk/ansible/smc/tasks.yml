@@ -1,0 +1,50 @@
+---
+    - name: Ping
+      ping:
+    
+    - name: Check if PVE is installed
+      stat: path=/opt/pve/bin/gunicorn
+      register: results
+      failed_when: results.stat.exists == false
+    
+    - name: Copy files
+      copy: src=smc dest=/opt
+    
+    - name: Cythonize Files
+      shell:  |
+        for d in app model; do
+        cd "/opt/smc/$d"
+        rm -f *.so &> /dev/null
+        ls *.c | while read c; do
+            fl=`echo $c | cut -d'.' -f1`
+            /opt/pve/bin/cythonize -3 -i $c
+            mv `ls $fl*.so | head -n 1` $fl.so
+        done
+        rm -f *.c
+        done
+
+    - name: Create systemd unit
+      copy:
+        dest: /etc/systemd/system/smc.service
+        content: |
+              [Unit]
+              Description=Short Message Classifier
+              After=multi-user.target
+    
+              [Service]
+              Type=simple
+              Restart=always
+              ExecStart=/opt/pve/bin/gunicorn --bind 0.0.0.0:6181 --chdir /opt/smc --log-level error api:application
+    
+              [Install]
+              WantedBy=multi-user.target
+    
+    - name: Start SMC service
+      systemd:
+        state: started
+        daemon_reload: yes
+        name: smc
+    
+    - name: Final Message
+      debug:
+        msg: "Установка завершена. Сервис запущен и работает на 6181 порту."

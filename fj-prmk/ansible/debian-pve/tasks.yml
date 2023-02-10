@@ -1,0 +1,37 @@
+---
+- name: Ping
+  ping:
+
+- name: copy archive iles
+  copy: src=archive.tgz dest=/root/
+  
+- name: extract archive
+  shell: tar xvf /root/archive.tgz
+
+- name: Install all packages from deb.files
+  shell: dpkg -i /root/packages/*
+
+- name: ensure that ENV variables exist
+  shell: |
+    PYENV_ROOT="/root/.pyenv"
+    [  $(grep -c PYENV_ROOT ~/.bashrc) -eq 0  ] && echo 'PYENV_ROOT="/root/.pyenv"' >>~/.bashrc
+    [  $(grep -c PATH ~/.bashrc) -eq 0  ] && echo "PATH='$PYENV_ROOT/bin:$PATH'">>~/.bashrc
+    exit 0
+- name: Install PyEnv offline mode
+  shell: |
+    eval "$(pyenv init -)"
+    pyenv install -s 3.9.16
+    cd /opt/pve
+    pyenv local 3.9.16
+    python3 -m venv /opt/pve
+  register: output
+  
+- name: Debug
+  debug:
+    msg: "{{ output.stdout }}"
+
+- name: Install specified python requirements offline from a local directory with downloaded packages
+  pip:
+    virtualenv: /opt/pve
+    requirements: /root/modules/requirements.txt
+    extra_args: "--no-index --find-links=file:///root/modules/"

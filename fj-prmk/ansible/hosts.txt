@@ -1,3 +1,8 @@
-[test_ansible_servers]
+[ansible_servers]
 alt   ansible_host=10.100.50.98   
 deb   ansible_host=10.100.50.91 
+
+[ansible_servers:vars]
+ansible_user=root
+ansible_ssh_pass=!QAzxsw2
+ansible_sudo_pass=!QAzxsw2
