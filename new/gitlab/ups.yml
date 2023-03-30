@@ -1,0 +1,46 @@
+stages:
+    - build
+    - install
+    - cleanup
+
+variables: 
+    SERVICE_DIR: /opt/ups
+    SERVICE_NAME: ups
+build:
+    stage: build
+    tags:
+        - docker
+    before_script:
+        - apt update -y
+        - apt install -y git
+        - mkdir branch_test
+        - cd branch_test
+        - git clone http://techuser:1234567890test@10.2.0.188:7080/installers/ups.git -b test
+        - cd ..
+        - mv branch_test/ups/$SERVICE_NAME-*-universal.sh ./
+    script:
+        - ./$SERVICE_NAME-*-universal.sh -p $SERVICE_NAME-*.tar.gz
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-universal.sh
+
+install:
+    stage: install
+    tags:
+        - "202"
+    script:
+        - sudo systemctl stop $SERVICE_NAME 2>/dev/null
+        - sudo ./$SERVICE_NAME-*-universal.sh -i -on
+        - sudo systemctl start $SERVICE_NAME 2>/dev/null
+        - sudo systemctl enable $SERVICE_NAME 2>/dev/null
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
+        - /usr/bin/curl --silent --data chat_id="-1001669151578" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5186207563:AAHtoAx4bi8C6FNmOr-bHy1tBVpiBdio4dk/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+clean:
+    stage: cleanup
+    tags:
+        - "202"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
+

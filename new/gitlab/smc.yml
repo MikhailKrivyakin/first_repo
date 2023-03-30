@@ -1,0 +1,38 @@
+stages:
+    - build
+    - install
+    - cleanup
+
+variables: 
+    SERVICE_DIR: /opt/smc
+    SERVICE_NAME: smc
+build:
+    stage: build
+    tags:
+        - docker
+    script:
+        - ./build.sh $PWD
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-install
+
+install:
+    stage: install
+    tags:
+        - "202"
+    script:
+        - sudo systemctl stop $SERVICE_NAME
+        - sudo bash -c "./$SERVICE_NAME-*-install"
+        - sudo systemctl start $SERVICE_NAME
+        - sudo systemctl enable $SERVICE_NAME 2>/dev/null
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
+        - echo $msg
+        - /usr/bin/curl --silent --data chat_id="-1001669151578" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5186207563:AAHtoAx4bi8C6FNmOr-bHy1tBVpiBdio4dk/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+clean:
+    stage: cleanup
+    tags:
+        - "202"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
