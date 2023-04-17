@@ -4,8 +4,8 @@ stages:
     - cleanup   # удаление директории проекта для экономии места
 
 variables: 
-    SERVICE_DIR: /opt/smc
-    SERVICE_NAME: smc
+    SERVICE_DIR: /opt/sbs
+    SERVICE_NAME: sbs
 build:
     stage: build
     tags:
@@ -27,10 +27,9 @@ install_202:
     tags:
         - "202"
     script:
-        - while [ `ps aux |grep "train.py" |grep -c tokenizer` -ne 0 ];do sleep 180; done
         - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
         - sudo bash -c "./$SERVICE_NAME-*-install"
-        - sudo systemctl start $SERVICE_NAME
+        - sudo systemctl start $SERVICE_NAME 2>/dev/null
         - sudo systemctl enable $SERVICE_NAME 2>/dev/null
         - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
         - echo $msg
@@ -48,10 +47,9 @@ install_190:
     tags:
         - "190"
     script:
-        - while [ `ps aux |grep "train.py" |grep -c tokenizer` -ne 0 ];do sleep 180; done
         - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
         - sudo bash -c "./$SERVICE_NAME-*-install"
-        - sudo systemctl start $SERVICE_NAME
+        - sudo systemctl start $SERVICE_NAME 2>/dev/null
         - sudo systemctl enable $SERVICE_NAME 2>/dev/null
         - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
         - echo $msg
@@ -62,6 +60,7 @@ install_190:
     except:
         variables:
             - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+
 
 ###################################### очистка директории от файлов ######################################################
 clean_202:

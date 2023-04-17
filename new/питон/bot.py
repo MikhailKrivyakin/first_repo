@@ -31,22 +31,22 @@ fuck_yous=["пошел нахуй","иди нахуй","Бот пошёл нах
 ############################# Проверка на то что пишет хозяин    #############################
 def check_owner(message):
   if message.from_user.username == "KrivyakinM" and message.chat.id == 871812811:
-    log("Проверка на авторизацию пройдена")
+    log.info("Проверка на авторизацию пройдена")
     return 1
   else:
-    log("Проверка на авторизацию не пройдена")
+    log.info("Проверка на авторизацию не пройдена")
     return 0
 
 #############################  Проверка статуса сервера ##########################
 @bot.message_handler(commands=['status'])
 def check_server_state(message):
-  log(f"Запрос о статусе сервера. Отправитель: {message.from_user.username}")
+  log.info(f"Запрос о статусе сервера. Отправитель: {message.from_user.username}")
   if check_owner(message) == 0:
     bot.send_message(message.chat.id,f"-----------------\nSorry, you either don`t have permissions to run this command, or it`s the wrong chat to do it.\n-----------------")
   else:
     state=server.state["Name"]
     bot.send_message(message.chat.id,f"-----------------\nСтатус сервера:  {state}\n-----------------")
-    log(f"Сообщение от сервера: {server.state}")
+    log.info(f"Сообщение от сервера: {state}")
 
 #############################  Выполнение команды на сервере ##########################
 @bot.message_handler(commands=['sendcommand'])
@@ -58,7 +58,7 @@ def ask_for_command(message):
     bot.register_next_step_handler(message, execute_command)
 
 def execute_command(message):
-  command = message.text
+  command = message.text.lower()
   if command in ["1","Перезагрузка","Reboot","reboot","ребут"]:
     bot.send_message(message.chat.id,f"-----------------\nВыполняю перезагрузку сервера\n-----------------") 
     result=server.reboot()

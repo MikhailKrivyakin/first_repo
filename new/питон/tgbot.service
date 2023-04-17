@@ -1,8 +1,14 @@
 [Unit]
-Description=tgbot
-After=multi-user.target
+Description=Bot
+After=syslog.target
+After=network.target
 
 [Service]
 Type=simple
+User=mihail
+WorkingDirectory=/home/mihail/Документы/GitHub/first_repo/new/питон
+ExecStart=/bin/bash /home/mihail/Документы/GitHub/first_repo/new/питон/start.sh
 Restart=always
-ExecStart=/home/mihail/Документы/GitHub/first_repo/new/питон/bot/bin/python3 /home/mihail/Документы/GitHub/first_repo/new/питон/bot.py
+
+[Install]
+WantedBy=multi-user.target

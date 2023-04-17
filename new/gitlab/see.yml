@@ -1,7 +1,7 @@
 stages:
-    - build
-    - install
-    - cleanup
+    - build     # сборка установщика в докер-контейнере и созранение его в артефактах.
+    - install   # установка на серверах, используя сохраненный артефакт
+    - cleanup   # удаление директории проекта для экономии места
 
 variables: 
     SERVICE_DIR: /opt/see
@@ -15,19 +15,55 @@ build:
     artifacts: 
         paths:
             - $SERVICE_NAME-*-universal.sh
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
 
-install:
+################################## развертывание сервиса на 10.2.0.202 и 10.2.0.190. Разворачиваются парралельно сразу после выполнения этапа build
+install_202:
     stage: install
     tags:
         - "202"
     script:
+        - while [ `ps aux |grep "train.py" |grep -c noize` -ne 0 ];do sleep 180; done
+        - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
         - sudo bash -c "./$SERVICE_NAME-*-universal.sh -i"
         - sudo systemctl start $SERVICE_NAME
         - sudo systemctl enable $SERVICE_NAME 2>/dev/null
         - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
         - echo $msg
         - /usr/bin/curl --silent --data chat_id="-1001669151578" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5186207563:AAHtoAx4bi8C6FNmOr-bHy1tBVpiBdio4dk/sendMessage?parse_mode=HTML" >/dev/null 2>&1
-clean:
+    needs: ["build"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+
+install_190:
+    stage: install
+    tags:
+        - "190"
+    script:
+        - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
+        - sudo bash -c "./$SERVICE_NAME-*-universal.sh -i"
+        - sudo systemctl start $SERVICE_NAME
+        - sudo systemctl enable $SERVICE_NAME 2>/dev/null
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на на стенде `hostname`</b>\n<b>--------------------------------</b>")
+        - echo $msg
+        - /usr/bin/curl --silent --data chat_id="-1001630087101" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+    needs: ["build"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+
+
+###################################### очистка директории от файлов ######################################################
+clean_202:
     stage: cleanup
     tags:
         - "202"
@@ -35,3 +71,25 @@ clean:
        - echo "Time to clean up"
     after_script:
        - rm -rf $CI_PROJECT_DIR
+    needs: ["install_202"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+
+
+clean_190:
+    stage: cleanup
+    tags:
+        - "190"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
+    needs: ["install_190"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
