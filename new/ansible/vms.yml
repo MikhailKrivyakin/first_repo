@@ -1,0 +1,8 @@
+api_host: 10.100.50.222
+api_user: root@pam
+api_password: "!QAzxsw2"
+node: pve01
+clone_vm: vm-alt8sp-template
+key_name: id_rsa.pub
+name: vm-from-ansible-krivyakin
+ipaddress: 10.100.50.203/24

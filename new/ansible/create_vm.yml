@@ -1,0 +1,57 @@
+---
+- name: Initial setup VM
+  hosts: proxmox_server
+  vars_files:
+    - vms.yml
+  tasks:
+    - name: Clone VMs
+      proxmox_kvm:
+        node: "{{ node }}"
+        name: "{{ name }}"
+        api_user: "{{ api_user }}"
+        api_password: "{{ api_password }}"
+        api_host: "{{ api_host }}"
+        clone: "{{ clone_vm }}"
+        full: yes
+      register: output
+
+    - set_fact: new_vmid="{{ output.vmid }}"
+
+    - debug: 
+        msg: "ВМ создана"
+
+    - name: Start VM
+      proxmox_kvm:
+        api_host:     "{{ api_host }}"
+        api_password: "{{ api_password }}"
+        api_user:     "{{ api_user }}"
+        vmid:         "{{ new_vmid }}"
+        node:         "{{ node }}"
+        state:        started
+
+    - debug: 
+        msg: "ВМ запущена"
+
+    - name: stop VM
+      proxmox_kvm:
+        api_host:     "{{ api_host }}"
+        api_password: "{{ api_password }}"
+        api_user:     "{{ api_user }}"
+        vmid:         "{{ new_vmid }}"
+        node:         "{{ node }}"
+        state:        stopped
+
+    - debug: 
+        msg: "ВМ остановлена"
+
+    - name: Delete VM
+      proxmox_kvm:
+        api_host:     "{{ api_host }}"
+        api_password: "{{ api_password }}"
+        api_user:     "{{ api_user }}"
+        vmid:         "{{ new_vmid }}"
+        node:         "{{ node }}"
+        state:        absent
+
+    - debug: 
+        msg: "ВМ удалена"

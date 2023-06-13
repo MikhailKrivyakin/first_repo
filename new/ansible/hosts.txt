@@ -1,0 +1,7 @@
+[ansible_servers]
+proxmox_server ansible_host=10.100.50.222
+
+[ansible_servers:vars]
+ansible_user=root
+ansible_ssh_pass=!QAzxsw2
+ansible_sudo_pass=!QAzxsw2

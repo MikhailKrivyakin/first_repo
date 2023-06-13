@@ -1,0 +1,28 @@
+Konstantin Shapovalov, [22.02.2023 14:39]
+это словарь
+
+Konstantin Shapovalov, [22.02.2023 14:39]
+строки вида 
+абажурами a0 b a0 zh u1 r a0 mj i0
+
+Konstantin Shapovalov, [22.02.2023 14:40]
+1 - удаление
+
+Konstantin Shapovalov, [22.02.2023 14:40]
+0 - безударный
+
+Konstantin Shapovalov, [22.02.2023 14:41]
+вот таблица перекодировки (возможно не все символы, она для английского, но скорее всего полная, алфавит междунароный)
+
+Konstantin Shapovalov, [22.02.2023 14:41]
+https://github.com/NVIDIA/NeMo/blob/main/scripts/tts_dataset_files/cmudict-arpabet_to_ipa_nv22.08.tsv
+
+Konstantin Shapovalov, [22.02.2023 14:41]
+получить нужно строки вида 
+транскрипция trɐn.ˈskrʲi.pt͡sɨj.ə
+
+Konstantin Shapovalov, [22.02.2023 14:42]
+если алфавит неполный, тогда просто нужно в сети найти недостающие соответствия
+
+Konstantin Shapovalov, [22.02.2023 14:42]
+либо, кто сможет, сразу IPA для русского, возможно он уже есть

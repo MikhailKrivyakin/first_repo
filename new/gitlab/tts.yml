@@ -1,0 +1,119 @@
+stages:
+    - build     # сборка установщика в докер-контейнере и созранение его в артефактах.
+    - install   # установка на серверах, используя сохраненный артефакт
+    - cleanup   # удаление директории проекта для экономии места
+
+
+# используемые chat_id и боты:
+# Робот-разработчик bot5186207563:AAHtoAx4bi8C6FNmOr-bHy1tBVpiBdio4dk
+# его чаты: 
+#       Разработка нейро ядра   -1001669151578
+#       Лексиком.Команда        -457749350
+# Бот админов и чат админов:
+#       5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU
+#       -1001630087101
+variables: 
+    SERVICE_DIR: /opt/tts
+    SERVICE_NAME: tts
+    STORAGE_DIR: /root/nextcloud/tts/3.0/
+build:
+    stage: build
+    tags:
+        - docker
+    script:
+        - ./build.sh $PWD
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-install
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+################################## развертывание сервиса на 10.2.0.202 и 10.2.0.190. Разворачиваются парралельно сразу после выполнения этапа build
+install_202:
+    stage: install
+    tags:
+        - "202"
+    script:
+        - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
+        - sudo bash -c "./$SERVICE_NAME-*-install"
+        - sudo systemctl start $SERVICE_NAME 2>/dev/null
+        - sudo systemctl enable $SERVICE_NAME 2>/dev/null
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на стенде `hostname`</b>\n<b>--------------------------------</b>")
+        - echo $msg
+        - /usr/bin/curl --silent --data chat_id="-1001669151578" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5186207563:AAHtoAx4bi8C6FNmOr-bHy1tBVpiBdio4dk/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+    needs: ["build"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_202/
+
+install_190:
+    stage: install
+    tags:
+        - "190"
+    script:
+        - sudo systemctl is-active $SERVICE_NAME && sudo systemctl stop $SERVICE_NAME 2>/dev/null
+        - sudo bash -c "./$SERVICE_NAME-*-install"
+        - sudo systemctl start $SERVICE_NAME 2>/dev/null
+        - sudo systemctl enable $SERVICE_NAME 2>/dev/null
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Сервис $SERVICE_NAME был успешно обновлён на стенде `hostname`</b>\n<b>--------------------------------</b>")
+        - echo $msg
+        - /usr/bin/curl --silent --data chat_id="-1001630087101" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+    needs: ["build"]
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-install
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_190/
+
+###################################### очистка директории от файлов ######################################################
+clean_202:
+    stage: cleanup
+    tags:
+        - "202"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
+    needs: ["install_202"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_202/
+
+clean_190:
+    stage: cleanup
+    tags:
+        - "190"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
+    needs: ["test_spr"]
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /release/
+            - $CI_COMMIT_MESSAGE =~ /except_190/
+
+###################################### оповестим в чат если пайплайн сломался ######################################################  
+alarm_all:
+    stage: cleanup
+    tags:
+        - "190"
+    when: on_failure
+    script:
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Пайплайн для  $SERVICE_NAME упал. Посмотрите на него, пожалуйста.</b>\n<b>--------------------------------</b>")
+        - /usr/bin/curl --silent --data chat_id="-1001630087101" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU/sendMessage?parse_mode=HTML" >/dev/null 2>&1

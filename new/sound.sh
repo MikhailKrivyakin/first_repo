@@ -89,7 +89,7 @@ function f_progress
     percents=$(( $output_files*100/$files_count ))
     case "$percents" in
         20) [ $printed_percent -eq 20 ] || echo "Текущий прогресс $percents%" && printed_percent=20;;
-        50) [ $printed_percent -eq 50 ] |ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss| echo "Текущий прогресс $percents%" && printed_percent=50;;
+        50) [ $printed_percent -eq 50 ] || echo "Текущий прогресс $percents%" && printed_percent=50;;
         75) [ $printed_percent -eq 75 ] || echo "Текущий прогресс $percents%" && printed_percent=75;;
         90) [ $printed_percent -eq 90 ] || echo "Текущий прогресс $percents%" && printed_percent=90;;
         *) ;;

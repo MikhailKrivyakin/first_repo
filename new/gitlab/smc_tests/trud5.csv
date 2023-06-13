@@ -1,0 +1,61 @@
+benefit_work	сколько
+benefit_work	выплата
+benefit_work	сумма
+benefit_work	размер
+benefit_work	деньги
+benefit_work	пособие
+benefit_work	начислят
+benefit_work	ежемесячная
+benefit_work	материальная помощь
+benefit_work	 денежная выплата
+benefit_work	 денежное довольствие
+end_work	ничего
+end_work	все спасибо
+end_work	нет
+end_work	больше ничего
+end_work	спасибо до свидания
+end_work	ничего спасибо большое
+end_work	ну все
+end_work	да все вроде
+end_work	да нет
+end_work	нет ничего
+end_work	все спасибо
+end_work	нет вопросов
+end_work	больше нет
+reg_czn	встать
+reg_czn	зарегистрироваться
+reg_czn	обращаться
+reg_czn	регистрация
+reg_czn	обратиться
+reg_czn	оформить 
+reg_czn	подать
+reg_czn	регистрировать
+reg_czn	зарегистрировать
+reg_czn	оформление
+reg_czn	подача
+reg_czn	учет
+reg_czn	резюме
+schedule_work	режим работы
+schedule_work	график
+schedule_work	время работы
+schedule_work	работает
+schedule_work	адресу
+schedule_work	контакт
+schedule_work	номер
+schedule_work	телефон
+schedule_work	где находиться
+schedule_work	как работают
+schedule_work	дозвониться
+schedule_work	попасть
+statement_work	трудности
+statement_work	проблемы
+statement_work	не могу
+statement_work	не получается
+statement_work	как написать
+statement_work	помощь
+statement_work	отозвать заявление
+statement_work	ошибка
+statement_work	редактировать
+statement_work	заменить
+statement_work	изменение данных
+statement_work	вернуть отозванное

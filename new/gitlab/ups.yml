@@ -1,6 +1,8 @@
 stages:
     - build     # сборка установщика в докер-контейнере и созранение его в артефактах.
     - install   # установка на серверах, используя сохраненный артефакт
+    - test      # запуск автотестов на 190 сервере
+    - deploy    # сохранение собранного установщика на некстклауд
     - cleanup   # удаление директории проекта для экономии места
 
 variables: 
@@ -18,11 +20,15 @@ build:
         - git clone http://techuser:1234567890test@10.2.0.188:7080/installers/ups.git -b test
         - cd ..
         - mv branch_test/ups/$SERVICE_NAME-*-universal.sh ./
+        - current_version=$(ls *.tar.gz | cut -d '-' -f 2)
+        - mv $SERVICE_NAME-*-universal.sh $SERVICE_NAME-${current_version%%.tar.gz}-universal.sh
     script:
         - ./$SERVICE_NAME-*-universal.sh -p $SERVICE_NAME-*.tar.gz
+        - ./$SERVICE_NAME-*-universal.sh -p $SERVICE_NAME-*.tar.gz # повторный запсук из за костыля с именем файла в инсталлере
     artifacts: 
         paths:
             - $SERVICE_NAME-*-universal.sh
+        expire_in: 1 hour
     only:
         - master
     except:
@@ -46,6 +52,7 @@ install_202:
     except:
         variables:
             - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_202/
 
 install_190:
     stage: install
@@ -61,9 +68,15 @@ install_190:
     needs: ["build"]
     only:
         - master
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-universal.sh
+        expire_in: 1 hour
     except:
         variables:
             - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_190/
+
 
 ###################################### очистка директории от файлов ######################################################
 clean_202:
@@ -80,6 +93,8 @@ clean_202:
     except:
         variables:
             - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_202/
+
 
 
 clean_190:
@@ -90,9 +105,71 @@ clean_190:
        - echo "Time to clean up"
     after_script:
        - rm -rf $CI_PROJECT_DIR
-    needs: ["install_190"]
+    needs: ["test_ups"]
     only:
         - master
     except:
         variables:
             - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_190/
+            - $CI_COMMIT_MESSAGE =~ /release/
+
+###################################### запуск питоновского скрипта авто-тестирования ######################################################
+test_ups:
+    stage: test
+    tags:
+        - "190"
+    script:
+       - sudo python3 test_ups.py
+    needs: ["install_190"]
+    artifacts: 
+        paths:
+            - $SERVICE_NAME-*-universal.sh
+        expire_in: 15 minutes
+    only:
+        - master
+    except:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /skip-pipeline/
+            - $CI_COMMIT_MESSAGE =~ /except_190/
+
+######################################  при успешных тестах выкладываем инсталятор на некстклауд ######################################################
+deploy_installer:
+    stage: deploy
+    tags:
+        - "190"
+    script:
+        - sudo scp $SERVICE_NAME-*-universal.sh root@$STORAGE_SERVER:$STORAGE_DIR
+        - sudo ssh root@$STORAGE_SERVER 'if [ $(ls -l $STORAGE_DIR |wc -l) -gt 10 ]; then rm -rf $STORAGE_DIR$(ls -1rt $STORAGE_DIR | head -1); fi'
+        - name=$(ls $SERVICE_NAME-*-universal.sh)
+        - msg=$(echo -e "<b>Доступна новая стабильная версия сервиса $SERVICE_NAME</b>\n<b>--------------------------------</b>\n<b>Инсталлятор $name  загружен в хранилище и доступен по ссылке</b>\nhttps://cloud.connect2ai.net/index.php/apps/files/?dir=/$SERVICE_NAME/3.0\n<b>--------------------------------</b>")
+        - /usr/bin/curl --silent --data chat_id="-1001630087101" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU/sendMessage?parse_mode=HTML" >/dev/null 2>&1
+    needs: ["test_ups"]
+    only:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /release/
+
+###################################### очистка директории от файлов ######################################################  
+clean_190_after_deploy:
+    stage: cleanup
+    tags:
+        - "190"
+    script:
+       - echo "Time to clean up"
+    after_script:
+       - rm -rf $CI_PROJECT_DIR
+    needs: ["deploy_installer"]
+    only:
+        variables:
+            - $CI_COMMIT_MESSAGE =~ /release/
+
+
+###################################### оповестим в чат если пайплайн сломался ######################################################  
+alarm_all:
+    stage: cleanup
+    tags:
+        - "190"
+    when: on_failure
+    script:
+        - msg=$(echo -e "<b>--------------------------------</b>\n<b>Пайплайн для  $SERVICE_NAME упал. Посмотрите на него, пожалуйста.</b>\n<b>--------------------------------</b>")
+        - /usr/bin/curl --silent --data chat_id="-1001630087101" --data-urlencode "text=${msg}" "https://api.telegram.org/bot5919117739:AAEE44LXoWDuTy8L_ZdgIt95D_-HhOOJ3VU/sendMessage?parse_mode=HTML" >/dev/null 2>&1
